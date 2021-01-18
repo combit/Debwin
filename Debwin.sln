@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 13.00
+# Visual Studio 16
+VisualStudioVersion = 15.0.26403.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debwin.Core", "Debwin.Core\Debwin.Core.csproj", "{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debwin.UI", "Debwin.UI\Debwin.UI.csproj", "{953C05DF-F486-4E98-83F0-4403648F5A4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "combit.DebwinExtensions", "combit.DebwinExtensions\combit.DebwinExtensions.csproj", "{9FC2CF0D-FC13-43AA-910C-EF3CB8E2DDF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{953C05DF-F486-4E98-83F0-4403648F5A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{953C05DF-F486-4E98-83F0-4403648F5A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{953C05DF-F486-4E98-83F0-4403648F5A4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{953C05DF-F486-4E98-83F0-4403648F5A4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FC2CF0D-FC13-43AA-910C-EF3CB8E2DDF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FC2CF0D-FC13-43AA-910C-EF3CB8E2DDF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FC2CF0D-FC13-43AA-910C-EF3CB8E2DDF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FC2CF0D-FC13-43AA-910C-EF3CB8E2DDF1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

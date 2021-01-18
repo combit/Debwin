@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\ILMerge.3.0.41\build\ILMerge.props" Condition="Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{953C05DF-F486-4E98-83F0-4403648F5A4F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Debwin.UI</RootNamespace>
+    <AssemblyName>Debwin.UI</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Doctor.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>Debwin4.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=3.0.6.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <HintPath>..\packages\DockPanelSuite.3.0.6\lib\net40\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking.ThemeVS2015, Version=3.0.6.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <HintPath>..\packages\DockPanelSuite.ThemeVS2015.3.0.6\lib\net40\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\DoubleBufferedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\LogControllerView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\LogControllerView.Designer.cs">
+      <DependentUpon>LogControllerView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MessageCollectorView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MessageCollectorView.Designer.cs">
+      <DependentUpon>MessageCollectorView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToolStripWithMdiSupport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\AboutDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AboutDialog.Designer.cs">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CreateMessageDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CreateMessageDialog.Designer.cs">
+      <DependentUpon>CreateMessageDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CreateUdpSourceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CreateUdpSourceDialog.Designer.cs">
+      <DependentUpon>CreateUdpSourceDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CreateFileSourceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CreateFileSourceDialog.Designer.cs">
+      <DependentUpon>CreateFileSourceDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\LogViewPanelColumnsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LogViewPanelColumnsDialog.Designer.cs">
+      <DependentUpon>LogViewPanelColumnsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SaveLogDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SaveLogDialog.Designer.cs">
+      <DependentUpon>SaveLogDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\LlJobAnalyzerPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\LlJobAnalyzerPanel.Designer.cs">
+      <DependentUpon>LlJobAnalyzerPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Util\CustomWin32Window.cs" />
+    <Compile Include="Util\GlobalKeyboardHook.cs" />
+    <Compile Include="Util\LogViewExtensions.cs" />
+    <Compile Include="Util\NativeMethods.cs" />
+    <Compile Include="Panels\FilterPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\FilterPanel.Designer.cs">
+      <DependentUpon>FilterPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\LogControllerPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\LogControllerPanel.Designer.cs">
+      <DependentUpon>LogControllerPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\LogStructurePanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\LogStructurePanel.Designer.cs">
+      <DependentUpon>LogStructurePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\LogViewPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\LogViewPanel.Designer.cs">
+      <DependentUpon>LogViewPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\MessageDetailsPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\MessageDetailsPanel.Designer.cs">
+      <DependentUpon>MessageDetailsPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\StartPagePanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Panels\StartPagePanel.Designer.cs">
+      <DependentUpon>StartPagePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Forms\MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\SingleAppInstanceHelper.cs" />
+    <Compile Include="Util\UserPreferences.cs" />
+    <EmbeddedResource Include="Controls\LogControllerView.resx">
+      <DependentUpon>LogControllerView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MessageCollectorView.resx">
+      <DependentUpon>MessageCollectorView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AboutDialog.resx">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CreateMessageDialog.resx">
+      <DependentUpon>CreateMessageDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CreateUdpSourceDialog.resx">
+      <DependentUpon>CreateUdpSourceDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\LogViewPanelColumnsDialog.resx">
+      <DependentUpon>LogViewPanelColumnsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CreateFileSourceDialog.resx">
+      <DependentUpon>CreateFileSourceDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SaveLogDialog.resx">
+      <DependentUpon>SaveLogDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\FilterPanel.resx">
+      <DependentUpon>FilterPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\LlJobAnalyzerPanel.resx">
+      <DependentUpon>LlJobAnalyzerPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\LogControllerPanel.resx">
+      <DependentUpon>LogControllerPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\LogStructurePanel.resx">
+      <DependentUpon>LogStructurePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\LogViewPanel.resx">
+      <DependentUpon>LogViewPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\MessageDetailsPanel.resx">
+      <DependentUpon>MessageDetailsPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\StartPagePanel.resx">
+      <DependentUpon>StartPagePanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Debwin4.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Tip.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Waste Bin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Copy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mm-Play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mm-Stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Notebook-View.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mm-Stop-Red.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Back.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Flag-Red.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Arrow Up-Orange 5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Arrow Up-Orange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Arrow Down-Orange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Doctor_Tray.ico" />
+    <Content Include="Doctor.ico" />
+    <Content Include="Resources\24bit\combitLogo.png" />
+    <Content Include="Resources\24bit\Error.png" />
+    <Content Include="Resources\24bit\Information.png" />
+    <Content Include="Resources\24bit\Tip.png" />
+    <Content Include="Resources\24bit\User-Comment.png" />
+    <Content Include="Resources\24bit\Warning.png" />
+    <Resource Include="Resources\debwin4.ico" />
+    <None Include="Resources\Autoscroll_Off.png" />
+    <None Include="Resources\Autoscroll_On.png" />
+    <None Include="Resources\Find.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\combit.DebwinExtensions\combit.DebwinExtensions.csproj">
+      <Project>{9fc2cf0d-fc13-43aa-910c-ef3cb8e2ddf1}</Project>
+      <Name>combit.DebwinExtensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Debwin.Core\Debwin.Core.csproj">
+      <Project>{83fadac9-d0da-40b8-8eb2-96e1467b86aa}</Project>
+      <Name>Debwin.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.41\build\ILMerge.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
