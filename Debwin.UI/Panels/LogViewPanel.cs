@@ -1066,7 +1066,7 @@ namespace Debwin.UI.Panels
                 currentSelectedMessage = GetSelectedLogMessage();
                 currentSelectedIndex = (lstLogMessages.SelectedIndices.Count > 0 ? lstLogMessages.SelectedIndices[0] : -1);
 
-                // If the selection was already on an issue, and the next match is it's neighbour message, we don't want to move the selection just to the next (previous) row
+                // If the selection was already on an issue, and the next match is its neighbour message, we don't want to move the selection just to the next (previous) row
                 // because often several lines of the same error text are sent as separate messages (e.g. LL/cRM)
                 // -> Start the search again so we jump to the next (group of) issue(s)
                 if (hasMatch && previousSelectedMessage != null && currentSelectedMessage != null
@@ -1083,6 +1083,8 @@ namespace Debwin.UI.Panels
                 }
                 else
                 {
+                    // make sure to set the cursor to the new position
+                    lstLogMessages.FocusedItem = lstLogMessages.Items[currentSelectedIndex];
                     break;
                 }
             }
@@ -1339,8 +1341,7 @@ namespace Debwin.UI.Panels
         {
             lstLogMessages.SelectedIndices.Clear();
             lstLogMessages.SelectedIndices.Add(rowIndex);
-            if (setAsFocusedItem)
-                lstLogMessages.FocusedItem = lstLogMessages.Items[rowIndex];  // focused item must match selected item to prevent unexpected behaviour when selecting a range with the shift key directly after jumping to a message
+            lstLogMessages.Items[rowIndex].Selected = true;
 
             int rowToScrollTo = rowIndex;
 
@@ -1363,6 +1364,12 @@ namespace Debwin.UI.Panels
             }
 
             lstLogMessages.EnsureVisible(rowToScrollTo);
+
+            if (setAsFocusedItem)
+            {
+                lstLogMessages.FocusedItem = lstLogMessages.Items[rowIndex];
+            }
+
         }
 
         private void errorCodeNegNumberToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1376,6 +1383,12 @@ namespace Debwin.UI.Panels
             txtSearchBox.BackColor = SystemColors.Window;
             _lastSearchReachedEndOfList = false;
         }
+
+        private void txtSearchBox_Click(object sender, System.EventArgs e)
+        {
+            txtSearchBox.BackColor = System.Drawing.SystemColors.Window;
+        }
+
 
         private void txtSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
@@ -1426,6 +1439,7 @@ namespace Debwin.UI.Panels
 
             lstLogMessages.SelectedIndices.Clear();
             lstLogMessages.SelectedIndices.Add(index);
+            lstLogMessages.FocusedItem = lstLogMessages.Items[index];
             lstLogMessages.EnsureVisible(index);
         }
 

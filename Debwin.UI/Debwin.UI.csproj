@@ -95,9 +95,6 @@
     <Compile Include="Controls\MessageCollectorView.Designer.cs">
       <DependentUpon>MessageCollectorView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ToolStripWithMdiSupport.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Forms\AboutDialog.cs">
       <SubType>Form</SubType>
     </Compile>

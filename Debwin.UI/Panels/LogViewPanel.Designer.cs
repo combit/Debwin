@@ -63,7 +63,7 @@
             this.includeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.excludeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lstLogMessages = new Debwin.UI.Controls.DoubleBufferedListView();
-            this.toolStrip1 = new Debwin.UI.Controls.ToolStripWithMdiSupport();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnCaptureActive = new System.Windows.Forms.ToolStripButton();
             this.btnClearLog = new System.Windows.Forms.ToolStripButton();
             this.btnToggleAutoScroll = new System.Windows.Forms.ToolStripButton();
@@ -594,6 +594,7 @@
             this.txtSearchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSearchBox_KeyPress);
             this.txtSearchBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtSearchBox_KeyUp);
             this.txtSearchBox.TextChanged += new System.EventHandler(this.txtSearchBox_TextChanged);
+            this.txtSearchBox.Click += new System.EventHandler(this.txtSearchBox_Click);
             // 
             // findTextMenuItem
             // 
@@ -688,7 +689,7 @@
         }
 
         #endregion
-        private Controls.ToolStripWithMdiSupport toolStrip1;
+        private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnToggleAutoScroll;
         private System.Windows.Forms.ToolStripButton btnClearLog;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
