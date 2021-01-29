@@ -57,6 +57,34 @@ namespace Debwin.UI
         private int _ctrlLeft1, _ctrlLeft2, _ctrlTop1, _ctrlTop2;
         private Screen _currentScreenBeforeMinimize;
 
+        public IDockContent GetContent(string persistString)
+        {
+            // by default, persist string is just the class name for the required IDockContent. Simply return the prepared classes.
+            switch (persistString)
+            {
+                case "Debwin.UI.Panels.FilterPanel":
+                    return _filterPanel;
+                case "Debwin.UI.Panels.LogControllerPanel":
+                    return _logControllerPanel;
+                case "Debwin.UI.Panels.LogStructurePanel":
+                    return _logStructurePanel;
+                case "Debwin.UI.Panels.StartPagePanel":
+                    return _startPagePanel;
+                case "Debwin.UI.Panels.LlJobAnalyzerPanel":
+                    return _jobAnalyzerPanel;
+                case "Debwin.UI.Panels.LogViewPanel":
+                    return _activeLogViewPanel;
+                case "Debwin.UI.Panels.MessageDetailsPanel":
+                    return _detailsPanel;
+            }
+            return null;
+        }
+
+        private static string GetDockPersistenceFile()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "combit", "Debwin4WindowStates.xml");
+        }
+
 
         public MainWindow(IDebwinController debwinController, IUserPreferences preferences)
         {
@@ -66,8 +94,9 @@ namespace Debwin.UI
             _ctrlTop2 = 0;
             _userPreferences = preferences;
             _debwinController = debwinController;
-
+            
             InitializeComponent();
+
             this.dockPanel1.ActiveContentChanged += this.dockPanel1_ActiveDocumentChanged;  // needs to be detached manually!
 
             this.WindowState = FormWindowState.Minimized;
@@ -82,24 +111,45 @@ namespace Debwin.UI
 
             var theme = new VS2015LightTheme();
             theme.Measures.DockPadding = 0;
+
             dockPanel1.Theme = theme;
-
             _filterPanel = new FilterPanel(_userPreferences);
-            _filterPanel.Show(dockPanel1, DockState.DockRightAutoHide);
             _filterPanel.RequestedFilter += filterPanel_RequestedFilter;
-
             _logControllerPanel = new LogControllerPanel(_debwinController);
-            _logControllerPanel.Show(dockPanel1, DockState.DockLeftAutoHide);
-            _logControllerPanel.Hide();  // although we directly hide it, the panel window should have been loaded so it can listen for the events of new log sources etc.
-
             _logStructurePanel = new LogStructurePanel();
-            _logStructurePanel.Show(dockPanel1, DockState.DockLeftAutoHide);
-            _logStructurePanel.Hide(); // see above
             _startPagePanel = new StartPagePanel(this, debwinController, preferences);
-            _startPagePanel.Show(dockPanel1, DockState.Document);
-
             _jobAnalyzerPanel = new LlJobAnalyzerPanel(this);
-            _jobAnalyzerPanel.Show(dockPanel1, DockState.DockRightAutoHide);
+            _detailsPanel = new MessageDetailsPanel(_userPreferences, this);
+            _detailsPanel.CloseButtonVisible = false;
+
+            if (File.Exists(GetDockPersistenceFile()))
+            {
+                // load dock states from XML
+                dockPanel1.LoadFromXml(GetDockPersistenceFile(), GetContent);
+
+                // if Debwin4 was closed without an active log view, the details panel might not have been initialized at the time - in that case, use default
+                if (_detailsPanel.DockState == DockState.Unknown || _detailsPanel.DockState == DockState.Hidden)
+                {
+                    _detailsPanelDockState = DockState.DockBottom;
+                }
+                else
+                {
+                    _detailsPanelDockState = _detailsPanel.DockState;
+                }
+                _detailsPanel.Hide();
+            }
+            else
+            {
+                // use defaults
+                _filterPanel.Show(dockPanel1, DockState.DockRightAutoHide);
+                _logControllerPanel.Show(dockPanel1, DockState.DockLeftAutoHide);
+                _logControllerPanel.Hide();  // although we directly hide it, the panel window should have been loaded so it can listen for the events of new log sources etc.          
+                _logStructurePanel.Show(dockPanel1, DockState.DockLeftAutoHide);
+                _logStructurePanel.Hide(); // see above           
+                _startPagePanel.Show(dockPanel1, DockState.Document);
+                _jobAnalyzerPanel.Show(dockPanel1, DockState.DockRightAutoHide);
+                _detailsPanelDockState = DockState.DockBottom;
+            }
 
             showTabsMenuItem.Checked = _userPreferences.ShowTabChars;
             this.TopMost = stayOnTopToolStripMenuItem.Checked = _userPreferences.MainWindowTopMost;
@@ -120,6 +170,8 @@ namespace Debwin.UI
         static bool _sessionEnding = false;
 
         private static int WM_QUERYENDSESSION = 0x11;
+        private DockState _detailsPanelDockState = DockState.Unknown;
+
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
             if (m.Msg == WM_QUERYENDSESSION)
@@ -230,11 +282,8 @@ namespace Debwin.UI
             logPanel.SelectedLogMessage += logPanel_SelectedLogMessage;
             logPanel.Activated += LogPanel_Activated;
 
-            if (_detailsPanel == null)
-            {
-                _detailsPanel = new MessageDetailsPanel(_userPreferences, this);
-                _detailsPanel.Show(dockPanel1, DockState.DockBottom);
-            }
+            if (_detailsPanelDockState != DockState.Hidden)
+                _detailsPanel.Show(dockPanel1, _detailsPanelDockState);
 
             logPanel.FormClosed += LogViewPanel_FormClosed;
         }
@@ -331,17 +380,14 @@ namespace Debwin.UI
 
             // async code in this event might run after disposing the form if we do not detach it before closing the form:
             this.dockPanel1.ActiveContentChanged -= this.dockPanel1_ActiveDocumentChanged;
+            dockPanel1.SaveAsXml(GetDockPersistenceFile());
 
             _globalKeyboardHook?.Dispose();
             _filterPanel.Close();
             _jobAnalyzerPanel.Close();
             _logControllerPanel.Close();
-
-            if (_logStructurePanel != null) { _logStructurePanel.Close(); }
-            if (_detailsPanel != null)
-            {
-                _detailsPanel.Close();
-            }
+            _logStructurePanel.Close();
+            _detailsPanel.Close();
 
             // remember last main window position
             _userPreferences.MainWindowState = this.WindowState;
