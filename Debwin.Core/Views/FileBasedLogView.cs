@@ -75,6 +75,26 @@ namespace Debwin.Core.Views
             _baseStream.Flush();
         }
 
+        public void WriteLongTermMonitoringFile(string path)
+        {
+            lock (_fileLock)
+            {
+                _baseStream.Seek(0, SeekOrigin.Begin);
+                using (StreamWriter sw = new StreamWriter(path))
+                {
+                    using (var sr = new StreamReader(_baseStream, Encoding.UTF8, true, 1024, true))
+                    {
+                        while (sr.Peek() >= 0)
+                        {
+                            sw.WriteLine(sr.ReadLine());
+                        }
+                        sr.Close();
+                    }
+                    sw.Close();
+                }
+            }
+        }
+
         private void InitializeFile(string filePath, bool append)
         {
             lock (_fileLock)

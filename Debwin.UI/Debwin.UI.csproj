@@ -192,6 +192,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\SingleAppInstanceHelper.cs" />
+    <Compile Include="Util\TaskScheduler.cs" />
     <Compile Include="Util\UserPreferences.cs" />
     <EmbeddedResource Include="Controls\LogControllerView.resx">
       <DependentUpon>LogControllerView.cs</DependentUpon>

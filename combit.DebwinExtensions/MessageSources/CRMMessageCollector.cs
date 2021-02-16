@@ -14,6 +14,8 @@ namespace combit.DebwinExtensions.MessageSources
     public class CRMMessageCollector : DefaultMessageCollector
     {
         public string LogFilePath { get; set; }
+        public bool EnableLongTermMonitoring { get; set; }
+
         protected override LogMessage ParseRawMessage(object rawMessage)
         {
             LogMessage msg = base.ParseRawMessage(rawMessage);
@@ -21,7 +23,7 @@ namespace combit.DebwinExtensions.MessageSources
             if (msg == null)
                 return null;
 
-            if (msg.Message == "Debwin.Command.ClearLogBufferAndFile")
+            if (msg.Message == "Debwin.Command.ClearLogBufferAndFile" && EnableLongTermMonitoring == false)
             {
                 // Send a handler through the pipeline that executes on all log views and clears them:
                 this.Observer.NotifyControlMessage(new ClearAllViewsOfControllerControlMessage(msg));

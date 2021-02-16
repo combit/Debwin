@@ -77,6 +77,8 @@ namespace Debwin.UI.Panels
                 _logController.ReceivedControlMessage += logController_ReceivedControlMessage;
             }
 
+            SetupLongTermMonitoring();
+
             this.FormClosed += LogViewPanel_FormClosed;
         }
 
@@ -774,8 +776,14 @@ namespace Debwin.UI.Panels
                 // Are there invisible file-based log views attached?
                 if (logView is FileBasedLogView fileLog)
                 {
+                    DialogResult dialogResult = DialogResult.No;
+                    if(fileLog.IsOverflowFile &&_userPreferences.EnableLongTermMonitoring == false)
+                    {
+                        dialogResult = MessageBox.Show("Debwin4 has written a backup log file because the in-memory buffer reached the maximum size. Would you like to remove the log file backup at '" + fileLog.FilePath + "'?", "Debwin4", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    }
+
                     // Deleting auto-attached files (happens when the in-memory buffer reaches the max. size) might be unwanted by the user
-                    if (!fileLog.IsOverflowFile || MessageBox.Show("Debwin4 has written a backup log file because the in-memory buffer reached the maximum size. Would you like to remove the log file backup at '" + fileLog.FilePath + "'?", "Debwin4", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (!fileLog.IsOverflowFile || dialogResult == DialogResult.Yes)
                     {
                         if (fileLog.IsOverflowFile)
                         {
@@ -1413,6 +1421,37 @@ namespace Debwin.UI.Panels
             {
                 EnableAutoScroll();
             }
+        }
+
+        private void SetupLongTermMonitoring()
+        {
+            string hour = DateTime.Now.ToString("HH");
+            Util.TaskScheduler.Instance.ScheduleTask(Convert.ToInt32(hour) + 1, 0, 1,  // Create a logfile every hour
+            () =>
+            {
+                if (_userPreferences.EnableLongTermMonitoring)
+                {
+                    string currentDateTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
+                    string path = _userPreferences.LogFilePath + string.Format("{0}-{1}.log4", LogController.Name, currentDateTime);
+                    var attachedFileWriter = _logController.GetLogViews().OfType<FileBasedLogView>().FirstOrDefault();
+                    if (attachedFileWriter != null)
+                    {
+                        attachedFileWriter.WriteLongTermMonitoringFile(path);
+                        this.Invoke(new Action(() => this.ClearLogViews()));
+                    }
+                    else
+                    {
+                        IQueryableLogView logView = GetCurrentLogView();
+                        if (logView != null)
+                        {
+                            SaveLogDialog saveLogDialog = new SaveLogDialog(logView, true, null, null);
+                            saveLogDialog.LogFilePath = _userPreferences.LogFilePath + string.Format("{0}-{1}.log4", LogController.Name, currentDateTime);
+                            saveLogDialog.ShowDialog();
+                            this.Invoke(new Action(() => this.ClearLogViews()));
+                        }
+                    }
+                }
+            });
         }
 
         private void CopySelectedMessages()

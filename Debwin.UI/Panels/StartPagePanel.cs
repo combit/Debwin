@@ -259,7 +259,7 @@ namespace Debwin.UI.Panels
             int port = UdpMessageSource.GetAvailablePort();
 
             // cRM uses a specialized message collector which handles the cRM-specific control messages
-            var messageCollector = new CRMMessageCollector() { Source = new CombitUdpMessageSource() { Port = port }, Parser = new ListLabelBinaryMessageParser(), LogFilePath = _userPreferences.LogFilePath };
+            var messageCollector = new CRMMessageCollector() { Source = new CombitUdpMessageSource() { Port = port }, Parser = new ListLabelBinaryMessageParser(), LogFilePath = _userPreferences.LogFilePath, EnableLongTermMonitoring = _userPreferences.EnableLongTermMonitoring };
             var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
             logController.AddView(rootView);
             logController.AddMessageCollector(messageCollector);

@@ -19,6 +19,8 @@ namespace Debwin.UI.Forms
             InitializeComponent();
             _settings = settings;
 
+            ToolTip longTermMonitoringToolTip = new ToolTip();
+            longTermMonitoringToolTip.SetToolTip(this.chkLongTermMonitoring,  "Saves the current log as \"??-yyyy-mm-dd-hh-mm.log4\" to the Logfile Path every hour and clears the log afterwards.");
             txtTimeFormat.Text = settings.TimeFormat;
             txtDateTimeFormat.Text = settings.DateTimeFormat;
             txtTextEditor.Text = settings.EditorPath;
@@ -28,6 +30,7 @@ namespace Debwin.UI.Forms
             chkInstallGlobalKeyboardHook.Checked = _settings.InstallKeyboardHook;
             chkIgnoreLogIndentation.Checked = _settings.IgnoreLogIndentation;
             chkEnableAutoscrollOnClear.Checked = _settings.EnableAutoScrollOnClearLog;
+            chkLongTermMonitoring.Checked = _settings.EnableLongTermMonitoring;
             chkLimitMessageCount.Checked = _settings.MaximumMessageCount!= -1;
             trackbarChangeRecursion = true;  // disable the auto value adjustment
             trackMaxMessageCount.Value = (_settings.MaximumMessageCount != -1 ? _settings.MaximumMessageCount : trackMaxMessageCount.Value);
@@ -71,6 +74,7 @@ namespace Debwin.UI.Forms
             _settings.InstallKeyboardHook = chkInstallGlobalKeyboardHook.Checked;
             _settings.EnableAutoScrollOnClearLog = chkEnableAutoscrollOnClear.Checked;
             _settings.IgnoreLogIndentation = chkIgnoreLogIndentation.Checked;
+            _settings.EnableLongTermMonitoring = chkLongTermMonitoring.Checked;
 
             int newMaxMessageCount = chkLimitMessageCount.Checked ? trackMaxMessageCount.Value : -1;
             if (_settings.MaximumMessageCount != newMaxMessageCount)

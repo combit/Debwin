@@ -38,6 +38,8 @@ namespace Debwin.UI.Util
         bool IgnoreLogIndentation { get; set; }
 
         bool ShowTabChars { get; set; }
+        
+        bool EnableLongTermMonitoring { get; set; }
 
         Rectangle MainWindowBounds { get; set; }
 
@@ -192,6 +194,8 @@ namespace Debwin.UI.Util
         public bool EnableAutoScrollOnClearLog { get; set; }
 
         public bool IgnoreLogIndentation { get; set; }
+
+        public bool EnableLongTermMonitoring { get; set; }
 
         public Rectangle MainWindowBounds { get; set; }
 

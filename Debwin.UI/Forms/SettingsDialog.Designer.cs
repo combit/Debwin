@@ -60,6 +60,7 @@
             this.txtLogFilePath = new System.Windows.Forms.TextBox();
             this.btnChooseDirectory = new System.Windows.Forms.Button();
             this.chooseLogFilePathDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.chkLongTermMonitoring = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trackMaxMessageCount)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -77,7 +78,7 @@
             this.label1.Location = new System.Drawing.Point(0, 3);
             this.label1.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(78, 15);
+            this.label1.Size = new System.Drawing.Size(77, 15);
             this.label1.TabIndex = 0;
             this.label1.Text = "Time Format:";
             // 
@@ -88,7 +89,7 @@
             this.label2.Location = new System.Drawing.Point(308, 0);
             this.label2.Margin = new System.Windows.Forms.Padding(0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(110, 15);
+            this.label2.Size = new System.Drawing.Size(109, 15);
             this.label2.TabIndex = 2;
             this.label2.Text = "Date+Time Format:";
             // 
@@ -238,7 +239,7 @@
             this.lblMaxMessageCount.AutoSize = true;
             this.lblMaxMessageCount.Location = new System.Drawing.Point(3, 0);
             this.lblMaxMessageCount.Name = "lblMaxMessageCount";
-            this.lblMaxMessageCount.Size = new System.Drawing.Size(97, 15);
+            this.lblMaxMessageCount.Size = new System.Drawing.Size(98, 15);
             this.lblMaxMessageCount.TabIndex = 0;
             this.lblMaxMessageCount.Tag = "Maximum Message Count: {0:n0}";
             this.lblMaxMessageCount.Text = "{max msg count}";
@@ -330,7 +331,7 @@
             this.tableLayoutPanel4.ColumnCount = 1;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel4.Controls.Add(this.label4, 0, 5);
-            this.tableLayoutPanel4.Controls.Add(this.flowLayoutPanel3, 0, 13);
+            this.tableLayoutPanel4.Controls.Add(this.flowLayoutPanel3, 0, 14);
             this.tableLayoutPanel4.Controls.Add(this.chkIgnoreLogIndentation, 0, 12);
             this.tableLayoutPanel4.Controls.Add(this.chkEnableAutostart, 0, 11);
             this.tableLayoutPanel4.Controls.Add(this.chkInstallGlobalKeyboardHook, 0, 10);
@@ -343,10 +344,12 @@
             this.tableLayoutPanel4.Controls.Add(this.chkLimitMessageCount, 0, 3);
             this.tableLayoutPanel4.Controls.Add(this.tableLayoutPanel5, 0, 6);
             this.tableLayoutPanel4.Controls.Add(this.tableLayoutPanel3, 0, 4);
+            this.tableLayoutPanel4.Controls.Add(this.chkLongTermMonitoring, 0, 13);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(7, 7);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
-            this.tableLayoutPanel4.RowCount = 15;
+            this.tableLayoutPanel4.RowCount = 16;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -384,7 +387,7 @@
             this.flowLayoutPanel3.Controls.Add(this.btnApply);
             this.flowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Top;
             this.flowLayoutPanel3.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 402);
+            this.flowLayoutPanel3.Location = new System.Drawing.Point(0, 427);
             this.flowLayoutPanel3.Margin = new System.Windows.Forms.Padding(0, 20, 0, 0);
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
             this.flowLayoutPanel3.Size = new System.Drawing.Size(617, 35);
@@ -448,6 +451,16 @@
             // chooseLogFilePathDialog
             // 
             this.chooseLogFilePathDialog.Description = "Choose the path for debug log files:";
+            // 
+            // chkLongTermMonitoring
+            // 
+            this.chkLongTermMonitoring.AutoSize = true;
+            this.chkLongTermMonitoring.Location = new System.Drawing.Point(3, 385);
+            this.chkLongTermMonitoring.Name = "chkLongTermMonitoring";
+            this.chkLongTermMonitoring.Size = new System.Drawing.Size(146, 19);
+            this.chkLongTermMonitoring.TabIndex = 12;
+            this.chkLongTermMonitoring.Text = "Long-term monitoring";
+            this.chkLongTermMonitoring.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 
@@ -520,5 +533,6 @@
         private System.Windows.Forms.TextBox txtLogFilePath;
         private System.Windows.Forms.Button btnChooseDirectory;
         private System.Windows.Forms.FolderBrowserDialog chooseLogFilePathDialog;
+        private System.Windows.Forms.CheckBox chkLongTermMonitoring;
     }
 }
