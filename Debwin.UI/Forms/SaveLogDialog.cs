@@ -34,9 +34,14 @@ namespace Debwin.UI.Forms
             _propertiesToWrite = propertiesToWrite;
             InitializeComponent();
             this.ShowIcon = false;   // Set this manually and not in the designer (http://stackoverflow.com/a/21935941/3680727)
-
+            
             // To prevent displaying the window for very short saves (< 250ms), first make the window invisible
             this.Opacity = 0;
+        }
+
+        public void SetFilter(string filter)
+        {
+            saveFileDialog1.Filter = filter;
         }
 
         private void SaveLogDialog_Load(object sender, EventArgs e)

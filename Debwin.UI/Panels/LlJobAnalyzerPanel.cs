@@ -80,9 +80,12 @@ namespace Debwin.UI.Panels
                         continue;
                     }
 
-                    if (msg.Message.Contains("<LlJobClose"))
+                    if (msg.Message.Contains(">LlJobClose"))
                     {
                         jobEntryStackForThread.Peek().JobItems.Add(msg);
+                    }
+                    else if (msg.Message.Contains("<LlJobClose"))
+                    {
                         jobEntryStackForThread.Pop();
                     }
                     else if (msg.Message.Contains("<LlPrintWithBoxStart") || msg.Message.Contains("<LlPrintStart"))

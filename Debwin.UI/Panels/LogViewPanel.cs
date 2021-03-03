@@ -309,6 +309,26 @@ namespace Debwin.UI.Panels
 
         public void ShowChooseColumnsDialog()
         {
+            // Prepare a list of the currently displayed properties from the visible list columns
+            var currentlySelectedPropertyIDs = lstLogMessages.Columns.Cast<ColumnHeader>().Select(column => (int)column.Tag);
+
+            // Let the user choose which properties to show
+            var selectedColumnsDialog = new LogViewPanelColumnsDialog(GetLogMessagePropertyInfo(), currentlySelectedPropertyIDs.ToList());
+            if (_mainWindow.ShowDialogEx(selectedColumnsDialog) == DialogResult.OK)
+            {
+                // Create new columns for the list, while restoring the width of columns that have existed before
+                var newColumns = selectedColumnsDialog.SelectedPropertyIDs.Select(propID => new LogViewPanelColumnDefinition()
+                {
+                    MessagePropertyID = propID,
+                    Width = lstLogMessages.Columns.Cast<ColumnHeader>().FirstOrDefault(c => (int)c.Tag == propID)?.Width ?? 150   // get previous column width or use default
+                });
+
+                CreateColumnsForColumnSet(newColumns.ToArray());   // ToArray() is required to execute the Linq before the listview is cleared
+            }
+        }
+
+        private IEnumerable<LogMessagePropertyInfo> GetLogMessagePropertyInfo()
+        {
             // We need to get a list of all properties that the messages in the view could have.
             // When messages from two sources are combined in one log controller, two different messages might have two different sets of properties
             // => get all message types, create an instance of each type, ask that instance for it's custom properties, and get the metadata for each of that properties:
@@ -321,24 +341,7 @@ namespace Debwin.UI.Panels
             // Then combine the custom properties with the built-in properties of each Debwin4 message object:
             LogMessage baseMessage = new LogMessage();
             var allStandardPropertyInfos = baseMessage.GetStandardPropertyIDs().Select(propId => baseMessage.GetPropertyMetadata(propId));
-            var availableProperties = Enumerable.Concat(allStandardPropertyInfos, allCustomPropertyInfos);
-
-            // Prepare a list of the currently displayed properties from the visible list columns
-            var currentlySelectedPropertyIDs = lstLogMessages.Columns.Cast<ColumnHeader>().Select(column => (int)column.Tag);
-
-            // Let the user choose which properties to show
-            var selectedColumnsDialog = new LogViewPanelColumnsDialog(availableProperties, currentlySelectedPropertyIDs.ToList());
-            if (_mainWindow.ShowDialogEx(selectedColumnsDialog) == DialogResult.OK)
-            {
-                // Create new columns for the list, while restoring the width of columns that have existed before
-                var newColumns = selectedColumnsDialog.SelectedPropertyIDs.Select(propID => new LogViewPanelColumnDefinition()
-                {
-                    MessagePropertyID = propID,
-                    Width = lstLogMessages.Columns.Cast<ColumnHeader>().FirstOrDefault(c => (int)c.Tag == propID)?.Width ?? 150   // get previous column width or use default
-                });
-
-                CreateColumnsForColumnSet(newColumns.ToArray());   // ToArray() is required to execute the Linq before the listview is cleared
-            }
+            return Enumerable.Concat(allStandardPropertyInfos, allCustomPropertyInfos);
         }
 
         private void CreateDefaultColumns(LogViewPanelColumnSet defaultColumns = null)
@@ -1201,8 +1204,34 @@ namespace Debwin.UI.Panels
             }
         }
 
+        private void btnSaveWithSpecificColumns_Click(object sender, EventArgs e)
+        {
+            LogViewPanelColumnsDialog selectedColumnsDialog;
 
-        private void copySelectedMessagesToolStripMenuItem_Click(object sender, EventArgs e)
+            if (_userPreferences.SelectedPropertyIDs.Count > 0)
+            {
+                // Let the user choose which properties to show
+                selectedColumnsDialog = new LogViewPanelColumnsDialog(GetLogMessagePropertyInfo(), _userPreferences.SelectedPropertyIDs);
+            }
+            else
+            {
+                // Prepare a list of the currently displayed properties from the visible list columns
+                var currentlySelectedPropertyIDs = lstLogMessages.Columns.Cast<ColumnHeader>().Select(column => (int)column.Tag);
+                // Let the user choose which properties to show
+                selectedColumnsDialog = new LogViewPanelColumnsDialog(GetLogMessagePropertyInfo(), currentlySelectedPropertyIDs.ToList());
+            }
+            selectedColumnsDialog.label1.Text = "Selected columns:";
+
+            if (_mainWindow.ShowDialogEx(selectedColumnsDialog) == DialogResult.OK)
+            {
+                _userPreferences.SelectedPropertyIDs = selectedColumnsDialog.SelectedPropertyIDs.ToList();
+                SaveLogDialog saveLogDialog = new SaveLogDialog(GetCurrentLogView(), true, null, selectedColumnsDialog.SelectedPropertyIDs.ToList());
+                saveLogDialog.SetFilter("Formatted log file|*.txt");
+                saveLogDialog.ShowDialog();
+            }
+        }
+
+            private void copySelectedMessagesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CopySelectedMessages();
         }

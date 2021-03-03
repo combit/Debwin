@@ -41,6 +41,8 @@ namespace Debwin.UI.Util
         
         bool EnableLongTermMonitoring { get; set; }
 
+        List<int> SelectedPropertyIDs { get; set; }
+
         Rectangle MainWindowBounds { get; set; }
 
         FormWindowState MainWindowState { get; set; }
@@ -196,6 +198,8 @@ namespace Debwin.UI.Util
         public bool IgnoreLogIndentation { get; set; }
 
         public bool EnableLongTermMonitoring { get; set; }
+
+        public List<int> SelectedPropertyIDs { get; set; }
 
         public Rectangle MainWindowBounds { get; set; }
 

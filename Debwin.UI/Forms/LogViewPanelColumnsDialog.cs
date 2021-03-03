@@ -24,24 +24,50 @@ namespace Debwin.UI.Forms
             InitializeComponent();
             List<int> alreadyAddedIDs = new List<int>() { PropertyIdentifiers.PROPERTY_LEVEL };   // ignore level - is always the first column and cannot be removed
 
-            foreach (int selectedPropID in selectedPropertyIDs)
+            IEnumerable<LogMessagePropertyInfo> selectedPropertiesList = GetLogMessagePropertyInfos(alreadyAddedIDs, availableProperties, selectedPropertyIDs);
+            IEnumerable<LogMessagePropertyInfo> availablePropertiesList = GetLogMessagePropertyInfos(alreadyAddedIDs, availableProperties);
+     
+            foreach (var item in selectedPropertiesList)
             {
-                if (alreadyAddedIDs.Contains(selectedPropID))
-                    continue;
-
-                var propInfo = availableProperties.First(p => p.PropertyID == selectedPropID);
-                lstSelectedProps.Items.Add(new PropertyInfoItem(propInfo));
-                alreadyAddedIDs.Add(selectedPropID);
+               lstSelectedProps.Items.Add(new PropertyInfoItem(item));
             }
 
+            foreach (var item in availablePropertiesList)
+            {
+               lstAvailableProps.Items.Add(new PropertyInfoItem(item));
+            }
+        }
+
+        private IEnumerable<LogMessagePropertyInfo> GetLogMessagePropertyInfos(List<int> alreadyAddedIDs, IEnumerable<LogMessagePropertyInfo> availableProperties)
+        {
+            List<LogMessagePropertyInfo> logMessagePropertyInfos = new List<LogMessagePropertyInfo>();
             foreach (var propInfo in availableProperties)
             {
                 if (alreadyAddedIDs.Contains(propInfo.PropertyID))
                     continue;
 
-                lstAvailableProps.Items.Add(new PropertyInfoItem(propInfo));
+                logMessagePropertyInfos.Add(propInfo);
                 alreadyAddedIDs.Add(propInfo.PropertyID);
             }
+            return logMessagePropertyInfos.ToList();
+        }
+
+        private IEnumerable<LogMessagePropertyInfo> GetLogMessagePropertyInfos(List<int> alreadyAddedIDs, IEnumerable<LogMessagePropertyInfo> availableProperties, IList<int> selectedPropertyIDs)
+        {
+            List<LogMessagePropertyInfo> logMessagePropertyInfos = new List<LogMessagePropertyInfo>();
+            foreach (int selectedPropID in selectedPropertyIDs)
+            {
+                if (alreadyAddedIDs.Contains(selectedPropID))
+                    continue;
+ 
+                var propInfo = availableProperties.FirstOrDefault(p => p.PropertyID == selectedPropID);
+                if (propInfo == null)
+                    continue;
+
+                logMessagePropertyInfos.Add(propInfo);
+                alreadyAddedIDs.Add(selectedPropID);
+            }
+            return logMessagePropertyInfos.ToList();
         }
 
         private void btnUpDown_Click(object sender, System.EventArgs e)

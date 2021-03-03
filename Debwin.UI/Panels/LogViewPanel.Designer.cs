@@ -70,6 +70,7 @@
             this.autoScrollToolstripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.btnSaveLog = new System.Windows.Forms.ToolStripSplitButton();
             this.btnSaveAndEditLog = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnSaveWithSpecificColumns = new System.Windows.Forms.ToolStripMenuItem();
             this.btnCopyLog = new System.Windows.Forms.ToolStripButton();
             this.btnAppendMessage = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -489,7 +490,7 @@
             // 
             this.btnSaveLog.DropDownButtonWidth = 16;
             this.btnSaveLog.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnSaveAndEditLog});
+            this.btnSaveAndEditLog, this.btnSaveWithSpecificColumns});
             this.btnSaveLog.Image = global::Debwin.UI.Properties.Resources.Save;
             this.btnSaveLog.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSaveLog.Name = "btnSaveLog";
@@ -505,6 +506,13 @@
             this.btnSaveAndEditLog.Size = new System.Drawing.Size(200, 22);
             this.btnSaveAndEditLog.Text = "Save and Open in Editor";
             this.btnSaveAndEditLog.Click += new System.EventHandler(this.btnSaveLog_Click);
+            // 
+            // btnSaveWithSpecificColumns
+            // 
+            this.btnSaveWithSpecificColumns.Name = "btnSaveWithSpecificColumns";
+            this.btnSaveWithSpecificColumns.Size = new System.Drawing.Size(200, 22);
+            this.btnSaveWithSpecificColumns.Text = "Save Log with Specific Columns";
+            this.btnSaveWithSpecificColumns.Click += new System.EventHandler(this.btnSaveWithSpecificColumns_Click);
             // 
             // btnCopyLog
             // 
@@ -725,6 +733,7 @@
         private System.Windows.Forms.ToolStripMenuItem patternsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem errorCodeNegNumberToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem btnSaveAndEditLog;
+        private System.Windows.Forms.ToolStripMenuItem btnSaveWithSpecificColumns;
         private System.Windows.Forms.ToolStripSplitButton btnSaveLog;
         private System.Windows.Forms.ToolStripStatusLabel lblVisibleMessages;
         private System.Windows.Forms.ToolStripStatusLabel lblBufferedMessagesCount;
