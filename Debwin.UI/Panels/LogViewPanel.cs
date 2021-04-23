@@ -1133,19 +1133,6 @@ namespace Debwin.UI.Panels
             bool useFilteredLog = saveOnlySelectedMessages; // if there is an explicit selection, we always need to use the visible log as source
             string outputFilePath = null;
 
-            // local function to run after the save
-            void ShowInExplorerOrEditor(string file)
-            {
-                if (openEditor)
-                {
-                    Process.Start(_userPreferences.EditorPath, file);
-                }
-                else if (MessageBox.Show(this, "Log was saved. Show log file in Windows Explorer?", "Debwin", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    Process.Start("explorer.exe", "/select, \"" + file + "\"");
-                }
-            }
-
             // The user might not intentionally save a filtered log...
             if (isFilterActive && !saveOnlySelectedMessages && MessageBox.Show("A filter is active. Would you like to save only the filtered (currently displayed) messages?" + Environment.NewLine + Environment.NewLine + "If the log file is for the combit support, please save an unfiltered log (choose 'No').", "Debwin4", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
@@ -1171,7 +1158,6 @@ namespace Debwin.UI.Panels
                         File.Copy(fileLog.FilePath, outputFilePath, true);
                     }
                 }
-                ShowInExplorerOrEditor(outputFilePath);
             }
             else
             {
@@ -1197,10 +1183,21 @@ namespace Debwin.UI.Panels
                 if (saveLogDialog.ShowDialog() == DialogResult.OK)
                     outputFilePath = saveLogDialog.LogFilePath;
             }
-
-            if (openEditor && outputFilePath != null)
+            if (outputFilePath != null)
             {
-                ShowInExplorerOrEditor(outputFilePath);
+                ShowInExplorerOrEditor(outputFilePath, openEditor);
+            }
+        }
+
+        private void ShowInExplorerOrEditor(string file, bool openEditor)
+        {
+            if (openEditor)
+            {
+                Process.Start(_userPreferences.EditorPath, file);
+            }
+            else if (MessageBox.Show(this, "Log was saved. Show log file in Windows Explorer?", "Debwin", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Process.Start("explorer.exe", "/select, \"" + file + "\"");
             }
         }
 
@@ -1228,6 +1225,11 @@ namespace Debwin.UI.Panels
                 SaveLogDialog saveLogDialog = new SaveLogDialog(GetCurrentLogView(), true, null, selectedColumnsDialog.SelectedPropertyIDs.ToList());
                 saveLogDialog.SetFilter("Formatted log file|*.txt");
                 saveLogDialog.ShowDialog();
+                string outputFilePath = saveLogDialog.LogFilePath;
+                if(outputFilePath != null)
+                {
+                    ShowInExplorerOrEditor(outputFilePath, false);
+                }
             }
         }
 
