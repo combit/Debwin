@@ -10,9 +10,11 @@ using Debwin.UI.Util;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Principal;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
@@ -166,8 +168,12 @@ namespace Debwin.UI.Panels
         {
             if (Registry.ClassesRoot.OpenSubKey("cRM.Application") == null)
             {
-                tableLayoutPanel1.Controls.Remove(this.btnStartCrmLog);
-                tableLayoutPanel1.ColumnCount = 2;
+                string exeName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "cRM.exe");
+                if (!File.Exists(exeName))
+                {
+                    tableLayoutPanel1.Controls.Remove(this.btnStartCrmLog);
+                    tableLayoutPanel1.ColumnCount = 2;
+                }
             }
             if (!_hasProcessedCommandLineArgs)
             {

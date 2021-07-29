@@ -9,7 +9,7 @@ namespace combit.DebwinExtensions.MessageSources
 {
 
     /// <summary>
-    /// Implements special handling for control messages from combit Relationsip Manager.
+    /// Implements special handling for control messages from combit Relationship Manager.
     /// </summary>
     public class CRMMessageCollector : DefaultMessageCollector
     {

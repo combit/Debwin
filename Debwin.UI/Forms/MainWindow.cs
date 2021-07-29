@@ -82,7 +82,12 @@ namespace Debwin.UI
 
         private static string GetDockPersistenceFile()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "combit", "Debwin4WindowStates.xml");
+            string combitDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "combit");
+            if (!Directory.Exists(combitDirectory))
+            {
+                Directory.CreateDirectory(combitDirectory);
+            }
+            return Path.Combine(combitDirectory, "Debwin4WindowStates.xml");
         }
 
 

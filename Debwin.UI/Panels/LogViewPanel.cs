@@ -830,6 +830,10 @@ namespace Debwin.UI.Panels
         {
             lstLogMessages.SelectedIndices.Clear();
             _autoScrollActive = true;
+            if (lstLogMessages.VirtualListSize > 0)
+            {
+                lstLogMessages.EnsureVisible(lstLogMessages.VirtualListSize - 1);
+            }
             UpdateToolbarButtonStates();
         }
 
@@ -1547,6 +1551,12 @@ namespace Debwin.UI.Panels
             else if (e.Control && e.KeyCode == Keys.S)
             {
                 btnSaveLog.PerformButtonClick();
+            }
+            // Enable AutoScrollOnScrollToEnd with shortcuts
+            else if ((e.Control && e.KeyCode == Keys.End || e.KeyCode == Keys.End) && _userPreferences.EnableAutoScrollOnScrollToEnd)
+            {
+                EnableAutoScroll();
+                e.Handled = true;
             }
             // Start Capturing
             else if (e.KeyCode == Keys.F9)
