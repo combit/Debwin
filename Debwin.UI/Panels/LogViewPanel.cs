@@ -1555,6 +1555,7 @@ namespace Debwin.UI.Panels
             // Enable AutoScrollOnScrollToEnd with shortcuts
             else if ((e.Control && e.KeyCode == Keys.End || e.KeyCode == Keys.End) && _userPreferences.EnableAutoScrollOnScrollToEnd)
             {
+                GoToMessage(lstLogMessages.VirtualListSize - 1);
                 EnableAutoScroll();
                 e.Handled = true;
             }

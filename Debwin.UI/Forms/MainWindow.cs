@@ -17,6 +17,7 @@ using WeifenLuo.WinFormsUI.Docking;
 using Microsoft.Win32;
 using System.Reflection;
 using System.Diagnostics;
+using System.Xml;
 
 namespace Debwin.UI
 {
@@ -129,31 +130,30 @@ namespace Debwin.UI
 
             if (File.Exists(GetDockPersistenceFile()))
             {
-                // load dock states from XML
-                dockPanel1.LoadFromXml(GetDockPersistenceFile(), GetContent);
+                try
+                {
+                    // load dock states from XML
+                    dockPanel1.LoadFromXml(GetDockPersistenceFile(), GetContent);
 
-                // if Debwin4 was closed without an active log view, the details panel might not have been initialized at the time - in that case, use default
-                if (_detailsPanel.DockState == DockState.Unknown || _detailsPanel.DockState == DockState.Hidden)
-                {
-                    _detailsPanelDockState = DockState.DockBottom;
+                    // if Debwin4 was closed without an active log view, the details panel might not have been initialized at the time - in that case, use default
+                    if (_detailsPanel.DockState == DockState.Unknown || _detailsPanel.DockState == DockState.Hidden)
+                    {
+                        _detailsPanelDockState = DockState.DockBottom;
+                    }
+                    else
+                    {
+                        _detailsPanelDockState = _detailsPanel.DockState;
+                    }
+                    _detailsPanel.Hide();
                 }
-                else
+                catch (XmlException)
                 {
-                    _detailsPanelDockState = _detailsPanel.DockState;
+                    InitUIToDefaults();
                 }
-                _detailsPanel.Hide();
             }
             else
             {
-                // use defaults
-                _filterPanel.Show(dockPanel1, DockState.DockRightAutoHide);
-                _logControllerPanel.Show(dockPanel1, DockState.DockLeftAutoHide);
-                _logControllerPanel.Hide();  // although we directly hide it, the panel window should have been loaded so it can listen for the events of new log sources etc.          
-                _logStructurePanel.Show(dockPanel1, DockState.DockLeftAutoHide);
-                _logStructurePanel.Hide(); // see above           
-                _startPagePanel.Show(dockPanel1, DockState.Document);
-                _jobAnalyzerPanel.Show(dockPanel1, DockState.DockRightAutoHide);
-                _detailsPanelDockState = DockState.DockBottom;
+                InitUIToDefaults();
             }
 
             showTabsMenuItem.Checked = _userPreferences.ShowTabChars;
@@ -170,6 +170,19 @@ namespace Debwin.UI
             logStructureToolStripMenuItem.Visible = true;
             logsToolStripMenuItem.Visible = true;
 #endif
+        }
+
+        private void InitUIToDefaults()
+        {
+            // use defaults
+            _filterPanel.Show(dockPanel1, DockState.DockRightAutoHide);
+            _logControllerPanel.Show(dockPanel1, DockState.DockLeftAutoHide);
+            _logControllerPanel.Hide();  // although we directly hide it, the panel window should have been loaded so it can listen for the events of new log sources etc.          
+            _logStructurePanel.Show(dockPanel1, DockState.DockLeftAutoHide);
+            _logStructurePanel.Hide(); // see above           
+            _startPagePanel.Show(dockPanel1, DockState.Document);
+            _jobAnalyzerPanel.Show(dockPanel1, DockState.DockRightAutoHide);
+            _detailsPanelDockState = DockState.DockBottom;
         }
 
         static bool _sessionEnding = false;
