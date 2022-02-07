@@ -56,8 +56,21 @@ namespace Debwin.UI.Panels
             txtTextSearch.Text = filter.MessageTextFilter ?? String.Empty;
             txtLogger.Text = filter.LoggerNames ?? String.Empty;
             txtThread.Text = filter.Thread ?? string.Empty;
-            txtDateFrom.Text = filter.DateFrom?.ToString(_userPreferences.DateTimeFormat) ?? string.Empty;
-            txtDateTo.Text = filter.DateUntil?.ToString(_userPreferences.DateTimeFormat) ?? string.Empty;
+            if (_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime)
+            {
+                txtDateFrom.Text = filter.MinTimeDifference > 0 ? filter.MinTimeDifference.ToString() : string.Empty;
+                txtDateTo.Text = filter.MaxTimeDifference > 0 ? filter.MaxTimeDifference.ToString() : string.Empty;
+            }
+            else if(_userPreferences.TimeFormatMode == TimeFormatMode.DateTime)
+            {
+                txtDateFrom.Text = filter.DateFrom?.ToString(_userPreferences.DateTimeFormat) ?? string.Empty;
+                txtDateTo.Text = filter.DateUntil?.ToString(_userPreferences.DateTimeFormat) ?? string.Empty;
+            }
+            else
+            {
+                txtDateFrom.Text = filter.TimeFrom?.ToString(_userPreferences.TimeFormat) ?? string.Empty;
+                txtDateTo.Text = filter.TimeUntil?.ToString(_userPreferences.TimeFormat) ?? string.Empty;
+            }
 
             if (filter.Criteria != null)
             {
@@ -71,6 +84,27 @@ namespace Debwin.UI.Panels
             }
 
             _currentFilterDefinition = filter;
+        }
+
+        public void ChangeDate_TimeLabels(TimeFormatMode timeFormatMode)
+        {
+            txtDateFrom.Text = "";
+            txtDateTo.Text = "";
+            if(timeFormatMode == TimeFormatMode.RelativeTime)
+            {
+                label2.Text = "Time Difference in ms (Min):";
+                label3.Text = "Time Difference in ms (Max):";
+            }
+            else if(timeFormatMode == TimeFormatMode.DateTime)
+            {
+                label2.Text = "Date/Time (From):";
+                label3.Text = "Date/Time (To):";
+            }
+            else
+            {
+                label2.Text = "Time (From):";
+                label3.Text = "Time (To):";
+            }
         }
 
         private FilterDefinition BuildFilterDefinition()
@@ -105,31 +139,94 @@ namespace Debwin.UI.Panels
                 filter.LoggerNames = txtLogger.Text;
             }
 
-            // Date From
-            if (!string.IsNullOrEmpty(txtDateFrom.Text))
+            if(_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime)
             {
-                if (DateTime.TryParseExact(txtDateFrom.Text, _userPreferences.DateTimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateFrom))
+                // TimeDifference Min
+                if (!string.IsNullOrEmpty(txtDateFrom.Text))
                 {
-                    filter.DateFrom = dateFrom;
+                    if (int.TryParse(txtDateFrom.Text, out int minTime) && minTime >= 0)
+                    {
+                        filter.MinTimeDifference = minTime;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateFrom, "Time difference must be a positive integer");
+                        return null;
+                    }
                 }
-                else
+
+                // TimeDifference Max
+                if (!string.IsNullOrEmpty(txtDateTo.Text))
                 {
-                    errorProvider.SetError(txtDateFrom, "Required date format is: " + _userPreferences.DateTimeFormat);
-                    return null;
+                    if (int.TryParse(txtDateTo.Text, out int maxTime) && maxTime >= 0)
+                    {
+                        filter.MaxTimeDifference = maxTime;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateTo, "Time difference must be a positive integer");
+                        return null;
+                    }
                 }
             }
-
-            // Date To
-            if (!string.IsNullOrEmpty(txtDateTo.Text))
+            else if (_userPreferences.TimeFormatMode == TimeFormatMode.DateTime)
             {
-                if (DateTime.TryParseExact(txtDateTo.Text, _userPreferences.DateTimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateTo))
+                // Date From
+                if (!string.IsNullOrEmpty(txtDateFrom.Text))
                 {
-                    filter.DateUntil = dateTo;
+                    if (DateTime.TryParseExact(txtDateFrom.Text, _userPreferences.DateTimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateFrom))
+                    {
+                        filter.DateFrom = dateFrom;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateFrom, "Required date format is: " + _userPreferences.DateTimeFormat);
+                        return null;
+                    }
                 }
-                else
+
+                // Date To
+                if (!string.IsNullOrEmpty(txtDateTo.Text))
                 {
-                    errorProvider.SetError(txtDateTo, "Required date format is: " + _userPreferences.DateTimeFormat);
-                    return null;
+                    if (DateTime.TryParseExact(txtDateTo.Text, _userPreferences.DateTimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateTo))
+                    {
+                        filter.DateUntil = dateTo;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateTo, "Required date format is: " + _userPreferences.DateTimeFormat);
+                        return null;
+                    }
+                }
+            }
+            else
+            {
+                // Time From
+                if (!string.IsNullOrEmpty(txtDateFrom.Text))
+                {
+                    if (DateTime.TryParseExact(txtDateFrom.Text, _userPreferences.TimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime timeFrom))
+                    {
+                        filter.TimeFrom = timeFrom;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateFrom, "Required time format is: " + _userPreferences.TimeFormat);
+                        return null;
+                    }
+                }
+
+                // Time To
+                if (!string.IsNullOrEmpty(txtDateTo.Text))
+                {
+                    if (DateTime.TryParseExact(txtDateTo.Text, _userPreferences.TimeFormat, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime timeTo))
+                    {
+                        filter.TimeUntil = timeTo;
+                    }
+                    else
+                    {
+                        SetErrorProvider(txtDateTo, "Required time format is: " + _userPreferences.TimeFormat);
+                        return null;
+                    }
                 }
             }
 
@@ -150,6 +247,12 @@ namespace Debwin.UI.Panels
             return filter;
         }
 
+        private void SetErrorProvider(Control control, string value)
+        {
+            criteriaTableLayout.Padding = new Padding(0, 12, 15, 0);
+            errorProvider.SetError(control, value);
+        }
+
         private void btnApplyFilter_Click(object sender, EventArgs e)
         {
             ApplyToLogView();
@@ -158,6 +261,7 @@ namespace Debwin.UI.Panels
         private void ApplyToLogView()
         {
             errorProvider.Clear();
+            criteriaTableLayout.Padding = new Padding(0, 12, 3, 0);
             RequestedFilter?.Invoke(this, new ApplyFilterEventArgs(BuildFilterDefinition()));
         }
 

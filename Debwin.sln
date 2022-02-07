@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 13.00
-# Visual Studio 16
-VisualStudioVersion = 15.0.26403.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 17
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debwin.Core", "Debwin.Core\Debwin.Core.csproj", "{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debwin.UI", "Debwin.UI\Debwin.UI.csproj", "{953C05DF-F486-4E98-83F0-4403648F5A4F}"

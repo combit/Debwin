@@ -18,6 +18,7 @@ namespace Debwin.UI.Forms
         private readonly IQueryableLogView _logView;
         private readonly bool _saveToFile;
         private readonly IEnumerable<int> _selectedIndices;
+        private readonly IEnumerable<LogMessage> _logMessages;
         private readonly IList<int> _propertiesToWrite;   // List of IDs of message properties that should be included (may be ignored for some file formats)
         private string _logFilePath;
         private CancellationTokenSource _cancelTokenSource;
@@ -26,11 +27,12 @@ namespace Debwin.UI.Forms
         /// <param name="saveToFile">True to save a file, false to write to the clipboard</param>
         /// <param name="selectedIndices">Indices of the log messages to process. Null to process all messages.</param>
         /// <param name="propertiesToWrite">IDs of the message properties to write (ie.e columns in the UI). May be ignored for non-formatted log formats.</param>
-        public SaveLogDialog(IQueryableLogView logView, bool saveToFile, IEnumerable<int> selectedIndices, IList<int> propertiesToWrite)
+        public SaveLogDialog(IQueryableLogView logView, bool saveToFile, IEnumerable<int> selectedIndices, IEnumerable<LogMessage> logMessages, IList<int> propertiesToWrite)
         {
             _logView = logView;
             _saveToFile = saveToFile;
             _selectedIndices = selectedIndices;
+            _logMessages = logMessages;
             _propertiesToWrite = propertiesToWrite;
             InitializeComponent();
             this.ShowIcon = false;   // Set this manually and not in the designer (http://stackoverflow.com/a/21935941/3680727)
@@ -84,7 +86,14 @@ namespace Debwin.UI.Forms
             _cancelTokenSource = new CancellationTokenSource();
 
             IQueryableLogView logClone = new MemoryBasedLogView(-1);   // do not register this at the controller, new messages are unwanted
-            _logView.CopyMessagesTo(logClone, _selectedIndices);
+            if (_logMessages != null)
+            {
+                _logView.CopyMessagesListTo(logClone, _logMessages);
+            }
+            else
+            {
+                _logView.CopyMessagesTo(logClone, _selectedIndices);
+            }
 
             // Start a timer that will make this window (and it`s progress bar) visible if the save is not completed within 250ms
             showWindowTimer.Start();

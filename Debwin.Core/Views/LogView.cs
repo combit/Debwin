@@ -25,9 +25,14 @@ namespace Debwin.Core
 
         LogMessage GetMessage(int index);
 
+        List<LogMessage> GetMessages(int[] indexes);
+        LogMessage GetPreviousMessage(LogMessage logMessage);
+
         /// <summary>Copies the log message with the indices specified in 'selectedIndices' to the target log view.</summary>
         /// <param name="selectedIndices">Limit to the specified indices. If null, all messages are copied.</param>
         void CopyMessagesTo(ILogView targetView, IEnumerable<int> selectedIndices);
+
+        void CopyMessagesListTo(ILogView targetView, IEnumerable<LogMessage> selectedLogMessages);
 
         int FindIndexOfMessage(bool findLastIndex, int startIndex, Predicate<LogMessage> predicate);
 

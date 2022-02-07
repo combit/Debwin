@@ -61,8 +61,7 @@ namespace Debwin.Core.Controller
             logController.AddMessageCollector(new DefaultMessageCollector()
             {
                 Source = messageSource,
-                Parser = messageParser,
-                CountAndSetLineNumbers = true // always set line numbers in order to support the job analyzer
+                Parser = messageParser
             });
             return logController;
         }

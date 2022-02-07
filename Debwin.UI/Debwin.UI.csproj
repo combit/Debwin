@@ -330,6 +330,7 @@
     <Content Include="Resources\24bit\Tip.png" />
     <Content Include="Resources\24bit\User-Comment.png" />
     <Content Include="Resources\24bit\Warning.png" />
+    <None Include="Resources\Bookmark.png" />
     <Resource Include="Resources\debwin4.ico" />
     <None Include="Resources\Autoscroll_Off.png" />
     <None Include="Resources\Autoscroll_On.png" />

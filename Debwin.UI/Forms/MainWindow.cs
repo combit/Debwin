@@ -185,6 +185,22 @@ namespace Debwin.UI
             _detailsPanelDockState = DockState.DockBottom;
         }
 
+        private void CheckBoxTimeFormatMode_CheckedChanged(Object sender, EventArgs e)
+        {
+            if(sender == miDateFormatDateTime)
+            {
+                _filterPanel.ChangeDate_TimeLabels(TimeFormatMode.DateTime);
+            }
+            else if (sender == miDateFormatRelative)
+            {
+                _filterPanel.ChangeDate_TimeLabels(TimeFormatMode.RelativeTime);
+            }
+            else
+            {
+                _filterPanel.ChangeDate_TimeLabels(TimeFormatMode.TimeOnly);
+            }
+        }
+
         static bool _sessionEnding = false;
 
         private static int WM_QUERYENDSESSION = 0x11;

@@ -13,8 +13,6 @@ namespace Debwin.Core.MessageSources
 
         public IMessageParser Parser { get; set; }
 
-        public bool CountAndSetLineNumbers { get; set; }
-
         public IMessageSource Source
         {
             get { return _messageSource; }
@@ -38,12 +36,8 @@ namespace Debwin.Core.MessageSources
 
             if (message != null)   // notify controller that new message is available
             {
-                if (this.CountAndSetLineNumbers)
-                {
-                    _currentLineNr++;
-                    message.LineNr = _currentLineNr;
-                }
-
+                _currentLineNr++;
+                message.LineNr = _currentLineNr;
                 _observer.NotifyNewLogMessage(this, message);
             }
         }

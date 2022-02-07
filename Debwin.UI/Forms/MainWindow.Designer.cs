@@ -239,12 +239,11 @@
             // 
             // miDateFormatTimeOnly
             // 
-            this.miDateFormatTimeOnly.Checked = true;
-            this.miDateFormatTimeOnly.CheckState = System.Windows.Forms.CheckState.Checked;
             this.miDateFormatTimeOnly.Name = "miDateFormatTimeOnly";
             this.miDateFormatTimeOnly.Size = new System.Drawing.Size(284, 22);
             this.miDateFormatTimeOnly.Text = "Time";
             this.miDateFormatTimeOnly.Click += new System.EventHandler(this.miDateFormatOption_Click);
+            this.miDateFormatTimeOnly.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
             // 
             // miDateFormatDateTime
             // 
@@ -252,19 +251,21 @@
             this.miDateFormatDateTime.Size = new System.Drawing.Size(284, 22);
             this.miDateFormatDateTime.Text = "Date + Time";
             this.miDateFormatDateTime.Click += new System.EventHandler(this.miDateFormatOption_Click);
+            this.miDateFormatDateTime.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
             // 
             // miDateFormatRelative
             // 
             this.miDateFormatRelative.Name = "miDateFormatRelative";
             this.miDateFormatRelative.Size = new System.Drawing.Size(284, 22);
-            this.miDateFormatRelative.Text = "Time Difference (To Previous Message)";
+            this.miDateFormatRelative.Text = "Time Difference in ms (To Previous Message)";
             this.miDateFormatRelative.Click += new System.EventHandler(this.miDateFormatOption_Click);
+            this.miDateFormatRelative.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
             // 
             // miDateFormatRelativeToRef
             // 
             this.miDateFormatRelativeToRef.Name = "miDateFormatRelativeToRef";
             this.miDateFormatRelativeToRef.Size = new System.Drawing.Size(284, 22);
-            this.miDateFormatRelativeToRef.Text = "Time Difference (To Reference Message)";
+            this.miDateFormatRelativeToRef.Text = "Time Difference in ms (To Reference Message)";
             this.miDateFormatRelativeToRef.Visible = false;
             this.miDateFormatRelativeToRef.Click += new System.EventHandler(this.miDateFormatOption_Click);
             // 

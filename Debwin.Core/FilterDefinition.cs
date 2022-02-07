@@ -15,10 +15,17 @@ namespace Debwin.Core
         public string LoggerNames { get; set; }
 
         public string MessageTextFilter { get; set; }
+        public int MinTimeDifference { get; set; }
+
+        public int MaxTimeDifference { get; set; }
 
         public DateTime? DateFrom { get; set; }
 
         public DateTime? DateUntil { get; set; }
+
+        public DateTime? TimeFrom { get; set; }
+
+        public DateTime? TimeUntil { get; set; }
 
         public string Thread { get; set; }
 
@@ -53,11 +60,11 @@ namespace Debwin.Core
                 if (MessageTextFilter.StartsWith("/") && MessageTextFilter.EndsWith("/") && MessageTextFilter.Length > 2)   // Regex search when in slashes:   /regex/
                 {
                     Regex regex = new Regex(MessageTextFilter.Substring(1, MessageTextFilter.Length - 2), RegexOptions.CultureInvariant | RegexOptions.Compiled);
-                    currentPredicate = (msg => oldPredicate(msg) && regex.IsMatch(msg.Message));
+                    currentPredicate = (msg => oldPredicate(msg) && regex.IsMatch(msg.Message) || msg.Level == LogLevel.UserComment);
                 }
                 else
                 {
-                    currentPredicate = (msg => oldPredicate(msg) && msg.Message.IndexOf(MessageTextFilter, StringComparison.OrdinalIgnoreCase) != -1);
+                    currentPredicate = (msg => oldPredicate(msg) && msg.Message.IndexOf(MessageTextFilter, StringComparison.OrdinalIgnoreCase) != -1 || msg.Level == LogLevel.UserComment);
                 }
             }
 
@@ -68,7 +75,7 @@ namespace Debwin.Core
                 Func<LogMessage, bool> loggerFilterPredicate = BuildIncludeOrExcludeFilter(LoggerNames, (LogMessage msg) => msg.LoggerName);
 
                 var oldPredicate = currentPredicate;
-                currentPredicate = (msg => oldPredicate(msg) && loggerFilterPredicate(msg));
+                currentPredicate = (msg => oldPredicate(msg) && loggerFilterPredicate(msg) || msg.Level == LogLevel.UserComment);
             }
 
             // Date From
@@ -77,7 +84,7 @@ namespace Debwin.Core
                 DateTime dateFrom = DateFrom.Value;
 
                 var oldPredicate = currentPredicate;
-                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp >= dateFrom);
+                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp >= dateFrom || msg.Level == LogLevel.UserComment);
 
             }
 
@@ -87,7 +94,42 @@ namespace Debwin.Core
                 DateTime dateTo = DateUntil.Value;
 
                 var oldPredicate = currentPredicate;
-                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp <= dateTo);
+                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp <= dateTo || msg.Level == LogLevel.UserComment);
+            }
+
+            // Time From
+            if (TimeFrom != null)
+            {
+                DateTime timeTo = TimeFrom.Value;
+
+                var oldPredicate = currentPredicate;
+                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp.TimeOfDay >= timeTo.TimeOfDay || msg.Level == LogLevel.UserComment);
+
+            }
+
+            // Time To
+            if (TimeUntil != null)
+            {
+                DateTime timeUntil = TimeUntil.Value;
+
+                var oldPredicate = currentPredicate;
+                currentPredicate = (msg => oldPredicate(msg) && msg.Timestamp.TimeOfDay <= timeUntil.TimeOfDay || msg.Level == LogLevel.UserComment);
+            }
+
+            // TimeDifference Min
+            if (MinTimeDifference > 0)
+            {
+                int timeMin = MinTimeDifference;
+                var oldPredicate = currentPredicate;
+                currentPredicate = (msg => oldPredicate(msg) && msg.RelativeTime >= timeMin || msg.Level == LogLevel.UserComment);
+            }
+
+            // TimeDifference Max
+            if (MaxTimeDifference > 0)
+            {
+                int timeMax = MaxTimeDifference;
+                var oldPredicate = currentPredicate;
+                currentPredicate = (msg => oldPredicate(msg) && msg.RelativeTime <= timeMax || msg.Level == LogLevel.UserComment);
             }
 
             // Thread
@@ -95,7 +137,7 @@ namespace Debwin.Core
             {
                 var oldPredicate = currentPredicate;
 
-                currentPredicate = (msg => oldPredicate(msg) && msg.Thread == Thread);
+                currentPredicate = (msg => oldPredicate(msg) && msg.Thread == Thread || msg.Level == LogLevel.UserComment);
 
             }
 
@@ -110,13 +152,13 @@ namespace Debwin.Core
                     {
                         case FilterOperator.StringEquals:
                             {
-                                currentPredicate = (msg => oldPredicate(msg) && criterion.ExpectedValues.Equals((string)msg.GetProperty(criterion.PropertyId), StringComparison.InvariantCultureIgnoreCase));
+                                currentPredicate = (msg => oldPredicate(msg) && criterion.ExpectedValues.Equals((string)msg.GetProperty(criterion.PropertyId), StringComparison.InvariantCultureIgnoreCase) || msg.Level == LogLevel.UserComment);
                                 break;
                             }
                         case FilterOperator.StringIncludesOrExcludes:
                             {
                                 Func<LogMessage, bool> moduleFilterPredicate = BuildIncludeOrExcludeFilter(criterion.ExpectedValues, (LogMessage msg) => msg.GetProperty(criterion.PropertyId) as string);
-                                currentPredicate = (msg => oldPredicate(msg) && moduleFilterPredicate(msg));
+                                currentPredicate = (msg => oldPredicate(msg) && moduleFilterPredicate(msg) || msg.Level == LogLevel.UserComment);
                                 break;
                             }
                     }

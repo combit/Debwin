@@ -17,6 +17,7 @@ namespace Debwin.Core.Views
         private readonly IMemoryBasedList<LogMessage> _messages;
         private readonly object _messagesLock = new object();
         private readonly int _maximumMessageCount;
+        private Dictionary<int, LogMessage> _messageDictionary = new Dictionary<int, LogMessage>();
 
 
         /// <param name="maximumMessageCount">-1 to allow an unlimited number of messages in this view, >= 0 for a ring-buffer behaviour where old message are dropped when the limit is reached.</param>
@@ -73,10 +74,32 @@ namespace Debwin.Core.Views
             }
         }
 
+        public void CopyMessagesListTo(ILogView targetView, IEnumerable<LogMessage> selectedLogMessages)
+        {
+            lock (this._messagesLock)
+            {
+                if (selectedLogMessages == null)
+                {
+                    targetView.AppendMessages(this._messages);
+                }
+                else
+                {
+                    foreach (var selectedLogMessage in selectedLogMessages)
+                    {
+                        targetView.AppendMessage(selectedLogMessage);
+                    }
+                }
+            }
+        }
+
 
         private void AppendMessageInternal(LogMessage message)
         {
             _messages.Add(message);
+            if (message.Level != LogLevel.UserComment)
+            {
+                _messageDictionary.Add(message.LineNr, message);
+            }
         }
 
 
@@ -144,6 +167,37 @@ namespace Debwin.Core.Views
                     return null;
 
                 return _messages[index];
+            }
+        }
+
+        public List<LogMessage> GetMessages(int[] indexes)
+        {
+            lock (_messagesLock)
+            {
+                List<LogMessage> selectedMessages = new List<LogMessage>();
+                foreach (int index in indexes)
+                {
+                    if (index < 0 || index >= _messages.Count)
+                        return null;
+
+                    selectedMessages.Add(_messages[index]);
+                }
+                return selectedMessages;
+            }
+        }
+
+        public LogMessage GetPreviousMessage(LogMessage logMessage)
+        {
+            lock (_messagesLock)
+            {
+                if (logMessage.LineNr == 1)
+                {
+                    return logMessage;
+                }
+                else
+                {
+                    return _messageDictionary[logMessage.LineNr - 1];
+                }
             }
         }
 

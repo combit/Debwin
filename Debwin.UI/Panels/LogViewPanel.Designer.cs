@@ -48,20 +48,6 @@
             this.panelLogLoader = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.panelLogView = new System.Windows.Forms.Panel();
-            this.mnuLogMessageContext = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.miSelectInUnfilteredView = new System.Windows.Forms.ToolStripMenuItem();
-            this.copySelectedMessagesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setBaseForRelativeTimeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.chooseColumnsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.filterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dateFromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dateToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.byThreadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.includeLoggerInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.excludeLoggerInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.includeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.excludeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lstLogMessages = new Debwin.UI.Controls.DoubleBufferedListView();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnCaptureActive = new System.Windows.Forms.ToolStripButton();
@@ -89,11 +75,31 @@
             this.patternsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.errorCodeNegNumberToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.goToLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mnuLogMessageContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.miSelectInUnfilteredView = new System.Windows.Forms.ToolStripMenuItem();
+            this.copySelectedMessagesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bookmarkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setBookmarkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nextBookmarkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.previousBookmarkMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyBookmarkedLinesMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAllBookmarksMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setBaseForRelativeTimeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.chooseColumnsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.filterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dateFromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dateToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.byThreadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.includeLoggerInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.excludeLoggerInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.includeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.excludeModuleInFilterMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.panelLogLoader.SuspendLayout();
             this.panelLogView.SuspendLayout();
-            this.mnuLogMessageContext.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.mnuLogMessageContext.SuspendLayout();
             this.SuspendLayout();
             // 
             // ilLogLevelIcons
@@ -105,6 +111,11 @@
             this.ilLogLevelIcons.Images.SetKeyName(2, "Warning.png");
             this.ilLogLevelIcons.Images.SetKeyName(3, "Error.png");
             this.ilLogLevelIcons.Images.SetKeyName(4, "User-Comment.png");
+            this.ilLogLevelIcons.Images.SetKeyName(5, "BookmarkTip.png");
+            this.ilLogLevelIcons.Images.SetKeyName(6, "BookmarkInformation.png");
+            this.ilLogLevelIcons.Images.SetKeyName(7, "BookmarkWarning.png");
+            this.ilLogLevelIcons.Images.SetKeyName(8, "BookmarkError.png");
+            this.ilLogLevelIcons.Images.SetKeyName(9, "BookmarkUser-Comment.png");
             // 
             // listviewLayoutTimer
             // 
@@ -140,8 +151,8 @@
             // 
             // lblReceivedMessageCount
             // 
-            this.lblReceivedMessageCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            this.lblReceivedMessageCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.lblReceivedMessageCount.Name = "lblReceivedMessageCount";
             this.lblReceivedMessageCount.Size = new System.Drawing.Size(25, 19);
@@ -157,8 +168,8 @@
             // 
             // lblBufferedMessagesCount
             // 
-            this.lblBufferedMessagesCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            this.lblBufferedMessagesCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.lblBufferedMessagesCount.Name = "lblBufferedMessagesCount";
             this.lblBufferedMessagesCount.Size = new System.Drawing.Size(25, 19);
@@ -175,8 +186,8 @@
             // 
             // lblFilterNameValue
             // 
-            this.lblFilterNameValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            this.lblFilterNameValue.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.lblFilterNameValue.Name = "lblFilterNameValue";
             this.lblFilterNameValue.Size = new System.Drawing.Size(51, 19);
@@ -194,8 +205,8 @@
             // 
             // lblVisibleMessageCount
             // 
-            this.lblVisibleMessageCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            this.lblVisibleMessageCount.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
             | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
             this.lblVisibleMessageCount.Name = "lblVisibleMessageCount";
             this.lblVisibleMessageCount.Size = new System.Drawing.Size(25, 19);
@@ -211,7 +222,7 @@
             this.lblAttachedFileNotification.Image = ((System.Drawing.Image)(resources.GetObject("lblAttachedFileNotification.Image")));
             this.lblAttachedFileNotification.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblAttachedFileNotification.Name = "lblAttachedFileNotification";
-            this.lblAttachedFileNotification.Size = new System.Drawing.Size(139, 19);
+            this.lblAttachedFileNotification.Size = new System.Drawing.Size(259, 19);
             this.lblAttachedFileNotification.Spring = true;
             this.lblAttachedFileNotification.Text = "{lblAttachedFileNotification}";
             this.lblAttachedFileNotification.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -235,7 +246,7 @@
             // 
             this.lblLineNumberLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.lblLineNumberLabel.Name = "lblLineNumberLabel";
-            this.lblLineNumberLabel.Size = new System.Drawing.Size(139, 19);
+            this.lblLineNumberLabel.Size = new System.Drawing.Size(670, 19);
             this.lblLineNumberLabel.Spring = true;
             this.lblLineNumberLabel.Text = "Ln";
             this.lblLineNumberLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -248,7 +259,7 @@
             // 
             // panelLogLoader
             // 
-            this.panelLogLoader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.panelLogLoader.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelLogLoader.Controls.Add(this.label1);
             this.panelLogLoader.Location = new System.Drawing.Point(1013, 22);
@@ -277,120 +288,6 @@
             this.panelLogView.Name = "panelLogView";
             this.panelLogView.Size = new System.Drawing.Size(976, 366);
             this.panelLogView.TabIndex = 9;
-            // 
-            // mnuLogMessageContext
-            // 
-            this.mnuLogMessageContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSelectInUnfilteredView,
-            this.copySelectedMessagesMenuItem,
-            this.setBaseForRelativeTimeMenuItem,
-            this.chooseColumnsMenuItem,
-            this.toolStripMenuItem1,
-            this.filterToolStripMenuItem,
-            this.dateFromToolStripMenuItem,
-            this.dateToToolStripMenuItem,
-            this.byThreadToolStripMenuItem,
-            this.includeLoggerInFilterMenuItem,
-            this.excludeLoggerInFilterMenuItem,
-            this.includeModuleInFilterMenuItem,
-            this.excludeModuleInFilterMenuItem});
-            this.mnuLogMessageContext.Name = "mnuLogMessageContext";
-            this.mnuLogMessageContext.Size = new System.Drawing.Size(269, 274);
-            this.mnuLogMessageContext.Opening += new System.ComponentModel.CancelEventHandler(this.mnuLogMessageContext_Opening);
-            // 
-            // miSelectInUnfilteredView
-            // 
-            this.miSelectInUnfilteredView.Enabled = false;
-            this.miSelectInUnfilteredView.Image = ((System.Drawing.Image)(resources.GetObject("miSelectInUnfilteredView.Image")));
-            this.miSelectInUnfilteredView.Name = "miSelectInUnfilteredView";
-            this.miSelectInUnfilteredView.Size = new System.Drawing.Size(268, 22);
-            this.miSelectInUnfilteredView.Text = "Undo Filters and Select This Message";
-            this.miSelectInUnfilteredView.Click += new System.EventHandler(this.miSelectInUnfilteredView_Click);
-            // 
-            // copySelectedMessagesMenuItem
-            // 
-            this.copySelectedMessagesMenuItem.Image = global::Debwin.UI.Properties.Resources.Copy;
-            this.copySelectedMessagesMenuItem.Name = "copySelectedMessagesMenuItem";
-            this.copySelectedMessagesMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.copySelectedMessagesMenuItem.Text = "Copy Selected Messages";
-            this.copySelectedMessagesMenuItem.Click += new System.EventHandler(this.copySelectedMessagesToolStripMenuItem_Click);
-            // 
-            // setBaseForRelativeTimeMenuItem
-            // 
-            this.setBaseForRelativeTimeMenuItem.Name = "setBaseForRelativeTimeMenuItem";
-            this.setBaseForRelativeTimeMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.setBaseForRelativeTimeMenuItem.Text = "Set as Base for Relative Timestamps";
-            this.setBaseForRelativeTimeMenuItem.Click += new System.EventHandler(this.setBaseForRelativeTimeMenuItem_Click);
-            // 
-            // chooseColumnsMenuItem
-            // 
-            this.chooseColumnsMenuItem.Name = "chooseColumnsMenuItem";
-            this.chooseColumnsMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.chooseColumnsMenuItem.Text = "Choose Columns...";
-            this.chooseColumnsMenuItem.Click += new System.EventHandler(this.chooseColumnsMenuItem_Click);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(265, 6);
-            // 
-            // filterToolStripMenuItem
-            // 
-            this.filterToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.filterToolStripMenuItem.Enabled = false;
-            this.filterToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filterToolStripMenuItem.Name = "filterToolStripMenuItem";
-            this.filterToolStripMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.filterToolStripMenuItem.Text = "Filter by";
-            // 
-            // dateFromToolStripMenuItem
-            // 
-            this.dateFromToolStripMenuItem.Name = "dateFromToolStripMenuItem";
-            this.dateFromToolStripMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.dateFromToolStripMenuItem.Text = "Date/Time (From)";
-            this.dateFromToolStripMenuItem.Click += new System.EventHandler(this.SetDateFilterToolStripMenuItem_Click);
-            // 
-            // dateToToolStripMenuItem
-            // 
-            this.dateToToolStripMenuItem.Name = "dateToToolStripMenuItem";
-            this.dateToToolStripMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.dateToToolStripMenuItem.Text = "Date/Time (To)";
-            this.dateToToolStripMenuItem.Click += new System.EventHandler(this.SetDateFilterToolStripMenuItem_Click);
-            // 
-            // byThreadToolStripMenuItem
-            // 
-            this.byThreadToolStripMenuItem.Name = "byThreadToolStripMenuItem";
-            this.byThreadToolStripMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.byThreadToolStripMenuItem.Text = "Thread";
-            this.byThreadToolStripMenuItem.Click += new System.EventHandler(this.byThreadToolStripMenuItem_Click);
-            // 
-            // includeLoggerInFilterMenuItem
-            // 
-            this.includeLoggerInFilterMenuItem.Name = "includeLoggerInFilterMenuItem";
-            this.includeLoggerInFilterMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.includeLoggerInFilterMenuItem.Text = "Logger (Include)";
-            this.includeLoggerInFilterMenuItem.Click += new System.EventHandler(this.includeLoggerInFilterMenuItem_Click);
-            // 
-            // excludeLoggerInFilterMenuItem
-            // 
-            this.excludeLoggerInFilterMenuItem.Name = "excludeLoggerInFilterMenuItem";
-            this.excludeLoggerInFilterMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.excludeLoggerInFilterMenuItem.Text = "Logger (Exclude)";
-            this.excludeLoggerInFilterMenuItem.Click += new System.EventHandler(this.excludeLoggerInFilterMenuItem_Click);
-            // 
-            // includeModuleInFilterMenuItem
-            // 
-            this.includeModuleInFilterMenuItem.Name = "includeModuleInFilterMenuItem";
-            this.includeModuleInFilterMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.includeModuleInFilterMenuItem.Text = "Module (Include)";
-            this.includeModuleInFilterMenuItem.Click += new System.EventHandler(this.includeModuleInFilterMenuItem_Click);
-            // 
-            // excludeModuleInFilterMenuItem
-            // 
-            this.excludeModuleInFilterMenuItem.Name = "excludeModuleInFilterMenuItem";
-            this.excludeModuleInFilterMenuItem.Size = new System.Drawing.Size(268, 22);
-            this.excludeModuleInFilterMenuItem.Text = "Module (Exclude)";
-            this.excludeModuleInFilterMenuItem.Click += new System.EventHandler(this.excludeModuleInFilterMenuItem_Click);
             // 
             // lstLogMessages
             // 
@@ -490,7 +387,8 @@
             // 
             this.btnSaveLog.DropDownButtonWidth = 16;
             this.btnSaveLog.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnSaveAndEditLog, this.btnSaveWithSpecificColumns});
+            this.btnSaveAndEditLog,
+            this.btnSaveWithSpecificColumns});
             this.btnSaveLog.Image = global::Debwin.UI.Properties.Resources.Save;
             this.btnSaveLog.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSaveLog.Name = "btnSaveLog";
@@ -503,14 +401,14 @@
             // btnSaveAndEditLog
             // 
             this.btnSaveAndEditLog.Name = "btnSaveAndEditLog";
-            this.btnSaveAndEditLog.Size = new System.Drawing.Size(200, 22);
+            this.btnSaveAndEditLog.Size = new System.Drawing.Size(242, 22);
             this.btnSaveAndEditLog.Text = "Save and Open in Editor";
             this.btnSaveAndEditLog.Click += new System.EventHandler(this.btnSaveLog_Click);
             // 
             // btnSaveWithSpecificColumns
             // 
             this.btnSaveWithSpecificColumns.Name = "btnSaveWithSpecificColumns";
-            this.btnSaveWithSpecificColumns.Size = new System.Drawing.Size(200, 22);
+            this.btnSaveWithSpecificColumns.Size = new System.Drawing.Size(242, 22);
             this.btnSaveWithSpecificColumns.Text = "Save Log with Specific Columns";
             this.btnSaveWithSpecificColumns.Click += new System.EventHandler(this.btnSaveWithSpecificColumns_Click);
             // 
@@ -581,7 +479,7 @@
             this.btnFindNextIssue.Image = global::Debwin.UI.Properties.Resources.Arrow_Down_Orange;
             this.btnFindNextIssue.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnFindNextIssue.Name = "btnFindNextIssue";
-            this.btnFindNextIssue.Size = new System.Drawing.Size(80, 22);
+            this.btnFindNextIssue.Size = new System.Drawing.Size(81, 22);
             this.btnFindNextIssue.Text = "Next Issue";
             this.btnFindNextIssue.ToolTipText = "Go to next warning/error (Ctrl+Down)";
             this.btnFindNextIssue.Click += new System.EventHandler(this.btnFindIssue_Click);
@@ -601,8 +499,8 @@
     "h:  /regex/";
             this.txtSearchBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSearchBox_KeyPress);
             this.txtSearchBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtSearchBox_KeyUp);
-            this.txtSearchBox.TextChanged += new System.EventHandler(this.txtSearchBox_TextChanged);
             this.txtSearchBox.Click += new System.EventHandler(this.txtSearchBox_Click);
+            this.txtSearchBox.TextChanged += new System.EventHandler(this.txtSearchBox_TextChanged);
             // 
             // findTextMenuItem
             // 
@@ -673,6 +571,173 @@
             this.goToLineToolStripMenuItem.Text = "Go to Line";
             this.goToLineToolStripMenuItem.Click += new System.EventHandler(this.goToLineToolStripMenuItem_Click);
             // 
+            // mnuLogMessageContext
+            // 
+            this.mnuLogMessageContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSelectInUnfilteredView,
+            this.copySelectedMessagesMenuItem,
+            this.bookmarkMenuItem,
+            this.setBaseForRelativeTimeMenuItem,
+            this.chooseColumnsMenuItem,
+            this.toolStripMenuItem1,
+            this.filterToolStripMenuItem,
+            this.dateFromToolStripMenuItem,
+            this.dateToToolStripMenuItem,
+            this.byThreadToolStripMenuItem,
+            this.includeLoggerInFilterMenuItem,
+            this.excludeLoggerInFilterMenuItem,
+            this.includeModuleInFilterMenuItem,
+            this.excludeModuleInFilterMenuItem});
+            this.mnuLogMessageContext.Name = "mnuLogMessageContext";
+            this.mnuLogMessageContext.Size = new System.Drawing.Size(268, 296);
+            this.mnuLogMessageContext.Opening += new System.ComponentModel.CancelEventHandler(this.mnuLogMessageContext_Opening);
+            // 
+            // miSelectInUnfilteredView
+            // 
+            this.miSelectInUnfilteredView.Enabled = false;
+            this.miSelectInUnfilteredView.Image = ((System.Drawing.Image)(resources.GetObject("miSelectInUnfilteredView.Image")));
+            this.miSelectInUnfilteredView.Name = "miSelectInUnfilteredView";
+            this.miSelectInUnfilteredView.Size = new System.Drawing.Size(267, 22);
+            this.miSelectInUnfilteredView.Text = "Undo Filters and Select This Message";
+            this.miSelectInUnfilteredView.Click += new System.EventHandler(this.miSelectInUnfilteredView_Click);
+            // 
+            // copySelectedMessagesMenuItem
+            // 
+            this.copySelectedMessagesMenuItem.Image = global::Debwin.UI.Properties.Resources.Copy;
+            this.copySelectedMessagesMenuItem.Name = "copySelectedMessagesMenuItem";
+            this.copySelectedMessagesMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.copySelectedMessagesMenuItem.Text = "Copy Selected Messages";
+            this.copySelectedMessagesMenuItem.Click += new System.EventHandler(this.copySelectedMessagesToolStripMenuItem_Click);
+            // 
+            // bookmarkMenuItem
+            // 
+            this.bookmarkMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setBookmarkMenuItem,
+            this.nextBookmarkMenuItem,
+            this.previousBookmarkMenuItem,
+            this.copyBookmarkedLinesMenuItem,
+            this.clearAllBookmarksMenuItem});
+            this.bookmarkMenuItem.Name = "bookmarkMenuItem";
+            this.bookmarkMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.bookmarkMenuItem.Text = "Bookmark";
+            // 
+            // setBookmarkMenuItem
+            // 
+            this.setBookmarkMenuItem.Image = global::Debwin.UI.Properties.Resources.Bookmark;
+            this.setBookmarkMenuItem.Name = "setBookmarkMenuItem";
+            this.setBookmarkMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.setBookmarkMenuItem.Text = "Toggle Bookmark (Ctrl+F2)";
+            this.setBookmarkMenuItem.Click += new System.EventHandler(this.setBookmarkMenuItem_Click);
+            // 
+            // nextBookmarkMenuItem
+            // 
+            this.nextBookmarkMenuItem.Image = global::Debwin.UI.Properties.Resources.Arrow_Down_Orange;
+            this.nextBookmarkMenuItem.Name = "nextBookmarkMenuItem";
+            this.nextBookmarkMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.nextBookmarkMenuItem.Text = "Next Bookmark (F2)";
+            this.nextBookmarkMenuItem.Click += new System.EventHandler(this.nextBookmarkMenuItem_Click);
+            // 
+            // previousBookmarkMenuItem
+            // 
+            this.previousBookmarkMenuItem.Image = global::Debwin.UI.Properties.Resources.Arrow_Up_Orange;
+            this.previousBookmarkMenuItem.Name = "previousBookmarkMenuItem";
+            this.previousBookmarkMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.previousBookmarkMenuItem.Text = "Previous Bookmark (Shift+F2)";
+            this.previousBookmarkMenuItem.Click += new System.EventHandler(this.previousBookmarkMenuItem_Click);
+            // 
+            // copyBookmarkedLinesMenuItem
+            // 
+            this.copyBookmarkedLinesMenuItem.Image = global::Debwin.UI.Properties.Resources.Copy;
+            this.copyBookmarkedLinesMenuItem.Name = "copyBookmarkedLinesMenuItem";
+            this.copyBookmarkedLinesMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.copyBookmarkedLinesMenuItem.Text = "Copy Bookmarked Lines";
+            this.copyBookmarkedLinesMenuItem.Click += new System.EventHandler(this.copyBookmarkedLinesMenuItem_Click);
+            // 
+            // clearAllBookmarksMenuItem
+            // 
+            this.clearAllBookmarksMenuItem.Image = global::Debwin.UI.Properties.Resources.Waste_Bin;
+            this.clearAllBookmarksMenuItem.Name = "clearAllBookmarksMenuItem";
+            this.clearAllBookmarksMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.clearAllBookmarksMenuItem.Text = "Clear All Bookmarks";
+            this.clearAllBookmarksMenuItem.Click += new System.EventHandler(this.clearAllBookmarksMenuItem_Click);
+            // 
+            // setBaseForRelativeTimeMenuItem
+            // 
+            this.setBaseForRelativeTimeMenuItem.Name = "setBaseForRelativeTimeMenuItem";
+            this.setBaseForRelativeTimeMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.setBaseForRelativeTimeMenuItem.Text = "Set as Base for Relative Timestamps";
+            this.setBaseForRelativeTimeMenuItem.Click += new System.EventHandler(this.setBaseForRelativeTimeMenuItem_Click);
+            // 
+            // chooseColumnsMenuItem
+            // 
+            this.chooseColumnsMenuItem.Name = "chooseColumnsMenuItem";
+            this.chooseColumnsMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.chooseColumnsMenuItem.Text = "Choose Columns...";
+            this.chooseColumnsMenuItem.Click += new System.EventHandler(this.chooseColumnsMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(264, 6);
+            // 
+            // filterToolStripMenuItem
+            // 
+            this.filterToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.filterToolStripMenuItem.Enabled = false;
+            this.filterToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.filterToolStripMenuItem.Name = "filterToolStripMenuItem";
+            this.filterToolStripMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.filterToolStripMenuItem.Text = "Filter by";
+            // 
+            // dateFromToolStripMenuItem
+            // 
+            this.dateFromToolStripMenuItem.Name = "dateFromToolStripMenuItem";
+            this.dateFromToolStripMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.dateFromToolStripMenuItem.Text = "Date/Time (From)";
+            this.dateFromToolStripMenuItem.Click += new System.EventHandler(this.SetDateFilterToolStripMenuItem_Click);
+            // 
+            // dateToToolStripMenuItem
+            // 
+            this.dateToToolStripMenuItem.Name = "dateToToolStripMenuItem";
+            this.dateToToolStripMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.dateToToolStripMenuItem.Text = "Date/Time (To)";
+            this.dateToToolStripMenuItem.Click += new System.EventHandler(this.SetDateFilterToolStripMenuItem_Click);
+            // 
+            // byThreadToolStripMenuItem
+            // 
+            this.byThreadToolStripMenuItem.Name = "byThreadToolStripMenuItem";
+            this.byThreadToolStripMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.byThreadToolStripMenuItem.Text = "Thread";
+            this.byThreadToolStripMenuItem.Click += new System.EventHandler(this.byThreadToolStripMenuItem_Click);
+            // 
+            // includeLoggerInFilterMenuItem
+            // 
+            this.includeLoggerInFilterMenuItem.Name = "includeLoggerInFilterMenuItem";
+            this.includeLoggerInFilterMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.includeLoggerInFilterMenuItem.Text = "Logger (Include)";
+            this.includeLoggerInFilterMenuItem.Click += new System.EventHandler(this.includeLoggerInFilterMenuItem_Click);
+            // 
+            // excludeLoggerInFilterMenuItem
+            // 
+            this.excludeLoggerInFilterMenuItem.Name = "excludeLoggerInFilterMenuItem";
+            this.excludeLoggerInFilterMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.excludeLoggerInFilterMenuItem.Text = "Logger (Exclude)";
+            this.excludeLoggerInFilterMenuItem.Click += new System.EventHandler(this.excludeLoggerInFilterMenuItem_Click);
+            // 
+            // includeModuleInFilterMenuItem
+            // 
+            this.includeModuleInFilterMenuItem.Name = "includeModuleInFilterMenuItem";
+            this.includeModuleInFilterMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.includeModuleInFilterMenuItem.Text = "Module (Include)";
+            this.includeModuleInFilterMenuItem.Click += new System.EventHandler(this.includeModuleInFilterMenuItem_Click);
+            // 
+            // excludeModuleInFilterMenuItem
+            // 
+            this.excludeModuleInFilterMenuItem.Name = "excludeModuleInFilterMenuItem";
+            this.excludeModuleInFilterMenuItem.Size = new System.Drawing.Size(267, 22);
+            this.excludeModuleInFilterMenuItem.Text = "Module (Exclude)";
+            this.excludeModuleInFilterMenuItem.Click += new System.EventHandler(this.excludeModuleInFilterMenuItem_Click);
+            // 
             // LogViewPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -689,9 +754,9 @@
             this.panelLogLoader.ResumeLayout(false);
             this.panelLogView.ResumeLayout(false);
             this.panelLogView.PerformLayout();
-            this.mnuLogMessageContext.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.mnuLogMessageContext.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -739,6 +804,12 @@
         private System.Windows.Forms.ToolStripStatusLabel lblBufferedMessagesCount;
         private System.Windows.Forms.ToolStripStatusLabel lblBufferedMessages;
         private System.Windows.Forms.ToolStripMenuItem setBaseForRelativeTimeMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bookmarkMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setBookmarkMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nextBookmarkMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem previousBookmarkMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearAllBookmarksMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyBookmarkedLinesMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem includeLoggerInFilterMenuItem;
         private System.Windows.Forms.ToolStripMenuItem excludeLoggerInFilterMenuItem;

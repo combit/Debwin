@@ -21,6 +21,8 @@ namespace Debwin.Core
 
         public DateTime Timestamp;
 
+        public int RelativeTime = 0;
+
         public string Message;
 
         public LogLevel Level;
@@ -28,6 +30,8 @@ namespace Debwin.Core
         public string Thread;
 
         public string LoggerName;
+
+        public bool IsBookmark;
 
         /// <summary>
         /// Returns the message property associated with the specified property ID or null, if this message type does not have that property.

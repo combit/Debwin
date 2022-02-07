@@ -34,8 +34,10 @@ namespace Debwin.UI.Panels
         private readonly IUserPreferences _userPreferences;
         private bool _autoScrollActive;
         private bool _autoScrollForced;  // for ring-buffering
+        private bool _isTimeDifferenceFilterEnabled;
         private static float _defaultListLogMessageFontSize = 8.25F;
         private DateTime? _baseTimestamp;   // If set, marks the base value for the display of relative timestamps
+        private List<LogMessage> bookmarkedLogMessages = new List<LogMessage>();
 
         public LogViewPanel(IMainWindow mainWindow, IUserPreferences userPreferences, ILogController logController, LogViewPanelOptions options)
         {
@@ -416,8 +418,26 @@ namespace Debwin.UI.Panels
         }
 
 
+        private void SetTimeDifferenceFilter(FilterDefinition filterDefinition)
+        {
+            if (filterDefinition != null)
+            {
+                if (_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime && (filterDefinition.MinTimeDifference > 0 || filterDefinition.MaxTimeDifference > 0))
+                {
+                    SetRelativeTime();
+                    _isTimeDifferenceFilterEnabled = true;
+                }
+                else
+                {
+                    _isTimeDifferenceFilterEnabled = false;
+                }
+            }
+        }
+
         public void HandleApplyFilterRequest(ApplyFilterEventArgs e)
         {
+            SetTimeDifferenceFilter(e.FilterDefinition);
+
             // Only for small logs we should allow the automatically triggered filters that are created while typing in the filter panel ("instant search")
             if (e.IsAutoTriggeredFilter && _logViewStack[0].MessageCount > 100000)
                 return;
@@ -432,6 +452,8 @@ namespace Debwin.UI.Panels
         /// <param name="extendCurrentFilter">True to create a sub view of the current view, false to filter based on the root (unfiltered) view.</param>
         public void PushFilteredView(FilterDefinition requestedFilter, bool setListFocusAfterFiltering)
         {
+            SetTimeDifferenceFilter(requestedFilter);
+
             var previouslySelectedMsg = GetSelectedLogMessage();
 
             GoToRootView();
@@ -607,6 +629,18 @@ namespace Debwin.UI.Panels
             }
         }
 
+        private void SetRelativeTime()
+        {
+            var baseView = GetRootLogView();
+            for (int i = 1; i < baseView.MessageCount; i++)
+            {
+                var msg = baseView.GetMessage(i);
+                DateTime baseValue = baseView.GetMessage(i - 1).Timestamp;  // compare with previous message
+                int relativeTimeMsec = (int)(msg.Timestamp - baseValue).TotalMilliseconds;
+                msg.RelativeTime = relativeTimeMsec;
+            }
+        }
+
 
         /// <summary>
         /// Creates a (virtual) listview row for a log message.
@@ -614,12 +648,17 @@ namespace Debwin.UI.Panels
         private void LstLogMessages_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             var currentView = GetCurrentLogView();
+            var baseView = GetRootLogView();
             const int ICON_DEBUG = 0;
             const int ICON_INFO = 1;
             const int ICON_WARN = 2;
             const int ICON_ERROR = 3;
             const int ICON_COMMENT = 4;
-
+            const int ICON_BOOKMARK_DEBUG = 5;
+            const int ICON_BOOKMARK_INFO = 6;
+            const int ICON_BOOKMARK_WARN = 7;
+            const int ICON_BOOKMARK_ERROR = 8;
+            const int ICON_BOOKMARK_COMMENT = 9;
             LogMessage message = currentView.GetMessage(e.ItemIndex);
 
 
@@ -642,23 +681,58 @@ namespace Debwin.UI.Panels
             switch (message.Level)
             {
                 case LogLevel.Debug:
-                    imageIndex = ICON_DEBUG;
+                    if (message.IsBookmark)
+                    {
+                        imageIndex = ICON_BOOKMARK_DEBUG;
+                    }
+                    else
+                    {
+                        imageIndex = ICON_DEBUG;
+                    }         
                     foreColor = Color.Gray;
                     break;
                 case LogLevel.Info:
-                    imageIndex = ICON_INFO;
+                    if (message.IsBookmark)
+                    {
+                        imageIndex = ICON_BOOKMARK_INFO;
+                    }
+                    else
+                    {
+                        imageIndex = ICON_INFO;
+                    }
                     break;
                 case LogLevel.Warning:
-                    imageIndex = ICON_WARN;
+                    if (message.IsBookmark)
+                    {
+                        imageIndex = ICON_BOOKMARK_WARN;
+                    }
+                    else
+                    {
+                        imageIndex = ICON_WARN;
+                    }
                     backColor = Color.LightYellow;
                     break;
                 case LogLevel.Error:
-                    imageIndex = ICON_ERROR;
+                    if (message.IsBookmark)
+                    {
+                        imageIndex = ICON_BOOKMARK_ERROR;
+                    }
+                    else
+                    {
+                        imageIndex = ICON_ERROR;
+                    }
                     backColor = Color.Firebrick;
                     foreColor = Color.White;
                     break;
                 case LogLevel.UserComment:
-                    imageIndex = ICON_COMMENT;
+                    if (message.IsBookmark)
+                    {
+                        imageIndex = ICON_BOOKMARK_COMMENT;
+                    }
+                    else
+                    {
+                        imageIndex = ICON_COMMENT;
+                    }
                     backColor = Color.LightGreen;
                     foreColor = Color.DarkGreen;
                     break;
@@ -700,30 +774,43 @@ namespace Debwin.UI.Panels
                 else if (value is DateTime)
                 {
                     DateTime currentTimestamp = (DateTime)value;
-
-                    if (_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime && e.ItemIndex > 0)   // relative time
+                    bool showDateTime = false;
+                    if (_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime && message.Level != LogLevel.UserComment)   // relative time
                     {
-                        DateTime baseValue = _baseTimestamp.HasValue ? _baseTimestamp.Value : currentView.GetMessage(e.ItemIndex - 1).Timestamp;  // compare with previous message or user-defined base timestamp?
-                        int relativeTimeMsec = (int)(currentTimestamp - baseValue).TotalMilliseconds;
+                        DateTime baseValue = default(DateTime);
 
-                        if (relativeTimeMsec == 0)
+                        if (e.ItemIndex > 0)
                         {
-                            currentCell.Text = "0";
+                            baseValue = _baseTimestamp.HasValue ? _baseTimestamp.Value : baseView.GetPreviousMessage(message).Timestamp;  // compare with previous message or user-defined base timestamp?baseValue = currentTimestamp;
                         }
-                        else if (relativeTimeMsec < 60 * 1000 || _baseTimestamp.HasValue)
+                        else if(!_isTimeDifferenceFilterEnabled)
                         {
-                            currentCell.Text = "+ " + relativeTimeMsec.ToString().PadLeft(3) + " ms";
-                            if (relativeTimeMsec > 50)
-                            {
-                                currentCell.ForeColor = Color.IndianRed;
-                            }
+                            currentCell.Text = FormatDatetimeColumn(currentTimestamp);
+                            showDateTime = true;
                         }
                         else
                         {
-                            currentCell.Text = FormatDatetimeColumn(currentTimestamp);  // for longer jumps, repeat the base value
+                            baseValue = _baseTimestamp.HasValue ? _baseTimestamp.Value : baseView.GetPreviousMessage(message).Timestamp;  // compare with previous message or user-defined base timestamp?baseValue = currentTimestamp;
+                        }
+
+                        if (!showDateTime)
+                        {
+                            int relativeTimeMsec = (int)(currentTimestamp - baseValue).TotalMilliseconds;
+                            if (relativeTimeMsec == 0)
+                            {
+                                currentCell.Text = "0";
+                            }
+                            else
+                            {
+                                currentCell.Text = "+ " + relativeTimeMsec.ToString().PadLeft(3) + " ms";
+                                if (relativeTimeMsec > 50)
+                                {
+                                    currentCell.ForeColor = Color.IndianRed;
+                                }
+                            }
                         }
                     }
-                    else  // absolute time
+                    else // absolute time
                     {
                         currentCell.Text = FormatDatetimeColumn(currentTimestamp);
                     }
@@ -744,7 +831,6 @@ namespace Debwin.UI.Panels
                     currentCell.Text = currentCell.Text.Replace("\t", "\\t");
                 }
             }
-
 
         }
 
@@ -938,8 +1024,18 @@ namespace Debwin.UI.Panels
             return (lstLogMessages.SelectedIndices.Count != 0 ? currentView.GetMessage(lstLogMessages.SelectedIndices[0]) : null);
         }
 
+        private List<LogMessage> GetSelectedLogMessages()
+        {
+            var currentView = GetCurrentLogView();
+            return (lstLogMessages.SelectedIndices.Count != 0 ? currentView.GetMessages(lstLogMessages.SelectedIndices.Cast<int>().ToArray()) : null);
+        }
+
         private void btnPopLogView_ButtonClick(object sender, EventArgs e)
         {
+            if(_isTimeDifferenceFilterEnabled)
+            {
+                _isTimeDifferenceFilterEnabled = false;
+            }
             var selectedMessage = GetSelectedLogMessage();
 
             PopLogView();
@@ -1053,8 +1149,53 @@ namespace Debwin.UI.Panels
             lstLogMessages.Invalidate();
         }
 
+        private void setBookmarkMenuItem_Click(object sender, EventArgs e)
+        {
+            List<LogMessage> selectedMessages = GetSelectedLogMessages();
+            if (selectedMessages == null)
+                return;
 
+            foreach (LogMessage selectedMessage in selectedMessages)
+            {
+                if (!selectedMessage.IsBookmark)
+                {
+                    selectedMessage.IsBookmark = true;
+                    bookmarkedLogMessages.Add(selectedMessage);
+                }
+                else
+                {
+                    selectedMessage.IsBookmark = false;
+                    bookmarkedLogMessages.Remove(selectedMessage);
+                }
+            }
+            lstLogMessages.Invalidate();
+        }
 
+        private void nextBookmarkMenuItem_Click(object sender, EventArgs e)
+        {
+            FindBookmarkForward();
+        }
+
+        private void previousBookmarkMenuItem_Click(object sender, EventArgs e)
+        {
+            FindBookmarkBackward();
+        }
+
+        private void copyBookmarkedLinesMenuItem_Click(object sender, EventArgs e)
+        {
+            var saveLogDialog = new SaveLogDialog(GetCurrentLogView(), false, null, bookmarkedLogMessages.OrderBy(o => o.Timestamp).ToList(), null);
+            saveLogDialog.ShowDialog();
+        }
+
+        private void clearAllBookmarksMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (LogMessage bookmarkedLogMessage in bookmarkedLogMessages)
+            {
+                bookmarkedLogMessage.IsBookmark = false;
+            }
+            bookmarkedLogMessages.Clear();
+            lstLogMessages.Invalidate();
+        }
 
         /// <summary>Searches for warnings and errors and selects the next match (that is not in the same group of warning/error messages).</summary>
         private void btnFindIssue_Click(object sender, EventArgs e)
@@ -1075,6 +1216,7 @@ namespace Debwin.UI.Panels
 
                 // Jump to the next (previous) issue
                 bool hasMatch = FindAndSelectMessage((message) => message.Level >= LogLevel.Warning, findLast);
+
                 lstLogMessages.Focus();
 
                 // Get position and level again
@@ -1103,6 +1245,18 @@ namespace Debwin.UI.Panels
                     break;
                 }
             }
+        }
+
+        private void FindBookmarkForward()
+        {
+            bool hasMatch = FindAndSelectMessage((message) => message.IsBookmark == true, false);
+            lstLogMessages.Focus();
+        }
+
+        private void FindBookmarkBackward()
+        {
+            bool hasMatch = FindAndSelectMessage((message) => message.IsBookmark == true, true);
+            lstLogMessages.Focus();
         }
 
         /// <summary>Lets the user enter a custom message and adds the comment to the log.</summary>
@@ -1178,7 +1332,7 @@ namespace Debwin.UI.Panels
 
                 IQueryableLogView logToSave = useFilteredLog ? GetCurrentLogView() : GetRootLogView();
 
-                var saveLogDialog = new SaveLogDialog(logToSave, saveToFile, saveOnlySelectedMessages ? Enumerable.OfType<int>(lstLogMessages.SelectedIndices) : null, columnsToSave);
+                var saveLogDialog = new SaveLogDialog(logToSave, saveToFile, saveOnlySelectedMessages ? Enumerable.OfType<int>(lstLogMessages.SelectedIndices) : null, null, columnsToSave);
                 if (openEditor)
                 {
                     saveLogDialog.LogFilePath = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetRandomFileName(), "log"));
@@ -1226,7 +1380,7 @@ namespace Debwin.UI.Panels
             if (_mainWindow.ShowDialogEx(selectedColumnsDialog) == DialogResult.OK)
             {
                 _userPreferences.SelectedPropertyIDs = selectedColumnsDialog.SelectedPropertyIDs.ToList();
-                SaveLogDialog saveLogDialog = new SaveLogDialog(GetCurrentLogView(), true, null, selectedColumnsDialog.SelectedPropertyIDs.ToList());
+                SaveLogDialog saveLogDialog = new SaveLogDialog(GetCurrentLogView(), true, null, null, selectedColumnsDialog.SelectedPropertyIDs.ToList());
                 saveLogDialog.SetFilter("Formatted log file|*.txt");
                 saveLogDialog.ShowDialog();
                 string outputFilePath = saveLogDialog.LogFilePath;
@@ -1479,7 +1633,7 @@ namespace Debwin.UI.Panels
                         IQueryableLogView logView = GetCurrentLogView();
                         if (logView != null)
                         {
-                            SaveLogDialog saveLogDialog = new SaveLogDialog(logView, true, null, null);
+                            SaveLogDialog saveLogDialog = new SaveLogDialog(logView, true, null, null, null);
                             saveLogDialog.LogFilePath = _userPreferences.LogFilePath + string.Format("{0}-{1}.log4", LogController.Name, currentDateTime);
                             saveLogDialog.ShowDialog();
                             this.Invoke(new Action(() => this.ClearLogViews()));
@@ -1501,7 +1655,7 @@ namespace Debwin.UI.Panels
                 this.lstLogMessages.SelectedIndices.CopyTo(selectedIndices, 0);
             }
 
-            var saveLogDialog = new SaveLogDialog(GetCurrentLogView(), false, selectedIndices, null);
+            var saveLogDialog = new SaveLogDialog(GetCurrentLogView(), false, selectedIndices, null, null);
             saveLogDialog.ShowDialog();
         }
 
@@ -1595,6 +1749,41 @@ namespace Debwin.UI.Panels
             else if (e.Control && e.KeyCode == Keys.S)
             {
                 btnSaveLog.PerformClick();
+            }
+            // Set Bookmark
+            else if (e.Control && e.KeyCode == Keys.F2)
+            {
+                List<LogMessage> selectedMessages = GetSelectedLogMessages();
+                if (selectedMessages == null)
+                    return;
+
+                foreach (LogMessage selectedMessage in selectedMessages)
+                {
+                    if (!selectedMessage.IsBookmark)
+                    {
+                        selectedMessage.IsBookmark = true;
+                        bookmarkedLogMessages.Add(selectedMessage);
+                    }
+                    else
+                    {
+                        selectedMessage.IsBookmark = false;
+                        bookmarkedLogMessages.Remove(selectedMessage);
+                    }
+                }
+                lstLogMessages.Invalidate();
+                e.Handled = true;
+            }
+            // Jump to Bookmark (backward)
+            else if (e.Shift && e.KeyCode == Keys.F2)
+            {
+                FindBookmarkBackward();
+                e.Handled = true;
+            }
+            // Jump to Bookmark (forward)
+            else if (e.KeyCode == Keys.F2)
+            {
+                FindBookmarkForward();
+                e.Handled = true;
             }
             // Select all items until the last (Shift+End)
             else if (e.Control && e.Shift && e.KeyCode == Keys.End && lstLogMessages.SelectedIndices.Count == 1)
