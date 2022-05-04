@@ -92,6 +92,7 @@
             this.rbDebug.Text = "  ";
             this.rbDebug.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbDebug.UseVisualStyleBackColor = true;
+            this.rbDebug.Click += new System.EventHandler(this.rbSeverity_Click);
             // 
             // rbInfo
             // 
@@ -105,6 +106,7 @@
             this.rbInfo.Text = " ";
             this.rbInfo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbInfo.UseVisualStyleBackColor = true;
+            this.rbInfo.Click += new System.EventHandler(this.rbSeverity_Click);
             // 
             // rbWarning
             // 
@@ -118,6 +120,7 @@
             this.rbWarning.Text = " ";
             this.rbWarning.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbWarning.UseVisualStyleBackColor = true;
+            this.rbWarning.Click += new System.EventHandler(this.rbSeverity_Click);
             // 
             // rbError
             // 
@@ -131,6 +134,7 @@
             this.rbError.Text = " ";
             this.rbError.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.rbError.UseVisualStyleBackColor = true;
+            this.rbError.Click += new System.EventHandler(this.rbSeverity_Click);
             // 
             // label2
             // 

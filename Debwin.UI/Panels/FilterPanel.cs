@@ -418,15 +418,28 @@ namespace Debwin.UI.Panels
             }
         }
 
+        
+
         private void txtTextSearch_TextChanged(object sender, EventArgs e)
         {
             // "Instant Search" - if we have no errors in the filter, we can try to apply it while typing
+            UpdateFilterDefinition();
+        }
+
+        private void UpdateFilterDefinition()
+        {
             try
             {
                 var filter = BuildFilterDefinition();
                 RequestedFilter?.Invoke(this, new ApplyFilterEventArgs(filter) { IsAutoTriggeredFilter = true });
             }
             catch (Exception) { }
+        }
+
+        private void rbSeverity_Click(object sender, EventArgs e)
+        {
+            // "Instant Search"
+            UpdateFilterDefinition();
         }
     }
 

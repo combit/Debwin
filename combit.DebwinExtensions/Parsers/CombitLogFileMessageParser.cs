@@ -128,7 +128,8 @@ namespace combit.DebwinExtensions.Parsers
                 ModuleName = module,
                 Thread = thread,
                 ProcessorNr = -1,
-                Timestamp = timestamp.Value
+                Timestamp = timestamp.Value,
+                Level = LogLevel.Debug
             };
         }
 
