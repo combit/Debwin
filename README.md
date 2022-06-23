@@ -1,7 +1,10 @@
 # Debwin
-Debwin is a UDP logging application for usage with the **List & Label Reporting Tool** that features a number of filtering and analysis features.
+Debwin is a UDP logging application for usage with the **List & Label Reporting Tool** that features a number of filtering and analysis features. See [this blogpost](https://www.combit.blog/en/new-loggin-application/) in our Reporting Blog for further information about Debwin and why we developed it.
 
 ![Debwin](https://github.com/combit/Debwin/blob/main/Images/Debwin4.png)
+
+# Using Debwin in Your Application
+See [this blogpost](https://www.combit.blog/en/logging-tool-debwin/) in our Reporting Blog to learn how use Debwin in your application.
 
 # Contributions
 We're happy to receive pull requests for any improvements on this repository.
