@@ -98,7 +98,7 @@ namespace Debwin.Core.Views
             _messages.Add(message);
             if (message.Level != LogLevel.UserComment)
             {
-                _messageDictionary.Add(message.LineNr, message);
+                _messageDictionary[message.LineNr] = message;
             }
         }
 
