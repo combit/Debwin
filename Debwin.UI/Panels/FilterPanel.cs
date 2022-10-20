@@ -72,6 +72,8 @@ namespace Debwin.UI.Panels
                 txtDateTo.Text = filter.TimeUntil?.ToString(_userPreferences.TimeFormat) ?? string.Empty;
             }
 
+            txtModule.Text = "";
+
             if (filter.Criteria != null)
             {
                 foreach (var criterion in filter.Criteria)
