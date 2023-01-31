@@ -240,31 +240,31 @@
             // miDateFormatTimeOnly
             // 
             this.miDateFormatTimeOnly.Name = "miDateFormatTimeOnly";
-            this.miDateFormatTimeOnly.Size = new System.Drawing.Size(284, 22);
+            this.miDateFormatTimeOnly.Size = new System.Drawing.Size(316, 22);
             this.miDateFormatTimeOnly.Text = "Time";
-            this.miDateFormatTimeOnly.Click += new System.EventHandler(this.miDateFormatOption_Click);
             this.miDateFormatTimeOnly.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
+            this.miDateFormatTimeOnly.Click += new System.EventHandler(this.miDateFormatOption_Click);
             // 
             // miDateFormatDateTime
             // 
             this.miDateFormatDateTime.Name = "miDateFormatDateTime";
-            this.miDateFormatDateTime.Size = new System.Drawing.Size(284, 22);
+            this.miDateFormatDateTime.Size = new System.Drawing.Size(316, 22);
             this.miDateFormatDateTime.Text = "Date + Time";
-            this.miDateFormatDateTime.Click += new System.EventHandler(this.miDateFormatOption_Click);
             this.miDateFormatDateTime.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
+            this.miDateFormatDateTime.Click += new System.EventHandler(this.miDateFormatOption_Click);
             // 
             // miDateFormatRelative
             // 
             this.miDateFormatRelative.Name = "miDateFormatRelative";
-            this.miDateFormatRelative.Size = new System.Drawing.Size(284, 22);
+            this.miDateFormatRelative.Size = new System.Drawing.Size(316, 22);
             this.miDateFormatRelative.Text = "Time Difference in ms (To Previous Message)";
-            this.miDateFormatRelative.Click += new System.EventHandler(this.miDateFormatOption_Click);
             this.miDateFormatRelative.CheckedChanged += new System.EventHandler(this.CheckBoxTimeFormatMode_CheckedChanged);
+            this.miDateFormatRelative.Click += new System.EventHandler(this.miDateFormatOption_Click);
             // 
             // miDateFormatRelativeToRef
             // 
             this.miDateFormatRelativeToRef.Name = "miDateFormatRelativeToRef";
-            this.miDateFormatRelativeToRef.Size = new System.Drawing.Size(284, 22);
+            this.miDateFormatRelativeToRef.Size = new System.Drawing.Size(316, 22);
             this.miDateFormatRelativeToRef.Text = "Time Difference in ms (To Reference Message)";
             this.miDateFormatRelativeToRef.Visible = false;
             this.miDateFormatRelativeToRef.Click += new System.EventHandler(this.miDateFormatOption_Click);
@@ -356,7 +356,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.IsMdiContainer = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(900, 560);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Debwin4";
