@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Debwin.UI
 {
@@ -29,7 +30,10 @@ namespace Debwin.UI
 
         private static void ShowGUI()
         {
-            // Try to load config
+            // use for troubleshooting start up problems
+            // AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            // Try to load config            
             var configFile = GetUserSettingsFile();
             IUserPreferences userPreferences;
             if (File.Exists(configFile))
@@ -58,6 +62,12 @@ namespace Debwin.UI
             // Save config
             (userPreferences as UserPreferences).SaveAsXml(GetUserSettingsFile());
         }
+
+        // see above, this can be used to troubleshoot startup problems
+        //private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        //{
+        //    Debugger.Launch();
+        //}
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {

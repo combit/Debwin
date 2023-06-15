@@ -146,7 +146,7 @@ namespace Debwin.UI
                     }
                     _detailsPanel.Hide();
                 }
-                catch (XmlException)
+                catch (Exception) // as this would otherwise crash the app on startup...
                 {
                     InitUIToDefaults();
                 }
@@ -316,7 +316,7 @@ namespace Debwin.UI
             logPanel.SelectedLogMessage += logPanel_SelectedLogMessage;
             logPanel.Activated += LogPanel_Activated;
 
-            if (_detailsPanelDockState != DockState.Hidden)
+            if (_detailsPanelDockState != DockState.Hidden && _detailsPanelDockState != DockState.Unknown)
                 _detailsPanel.Show(dockPanel1, _detailsPanelDockState);
 
             logPanel.FormClosed += LogViewPanel_FormClosed;

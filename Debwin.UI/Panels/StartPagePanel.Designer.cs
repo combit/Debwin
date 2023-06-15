@@ -147,7 +147,7 @@
             this.btnStartCrmLog.Padding = new System.Windows.Forms.Padding(5);
             this.btnStartCrmLog.Size = new System.Drawing.Size(351, 97);
             this.btnStartCrmLog.TabIndex = 6;
-            this.btnStartCrmLog.Text = "Capture cRM Log";
+            this.btnStartCrmLog.Text = "Capture combit CRM Log";
             this.btnStartCrmLog.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.btnStartCrmLog.UseMnemonic = false;
             this.btnStartCrmLog.Click += new System.EventHandler(this.btnStartCrmLog_Click);
