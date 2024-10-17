@@ -1443,12 +1443,17 @@ namespace Debwin.UI.Panels
             SetCurrentSearchText(txtSearchBox.Text);
             if (txtSearchBox.Text.StartsWith("/") && txtSearchBox.Text.EndsWith("/") && txtSearchBox.Text.Length > 2)  // Regex search when in slashes:   /regex/
             {
-                Regex regex = new Regex(txtSearchBox.Text.Substring(1, txtSearchBox.Text.Length - 2), RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-                predicate = (msg) => regex.Match(msg.Message).Success;
+                Regex regex = new Regex(txtSearchBox.Text.Substring(1, txtSearchBox.Text.Length - 2), RegexOptions.CultureInvariant | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                predicate = (msg) => regex.IsMatch(msg.Message);
             }
             else
             {
-                predicate = (msg) => msg.Message.IndexOf(txtSearchBox.Text, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture) != -1;
+                var searchText = txtSearchBox.Text;
+                var comparisonType = ignoreCase
+                    ? StringComparison.InvariantCultureIgnoreCase
+                    : StringComparison.InvariantCulture;
+
+                predicate = (msg) => msg.Message.IndexOf(searchText, comparisonType) >= 0;
             }
 
             txtSearchBox.Enabled = false;
