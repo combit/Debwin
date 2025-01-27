@@ -206,6 +206,7 @@ namespace Debwin.Core.Views
             lock (_messagesLock)
             {
                 _messages.Clear();
+                _messageDictionary.Clear();
             }
 
             //if (_observer != null)

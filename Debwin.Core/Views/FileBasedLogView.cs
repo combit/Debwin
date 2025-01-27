@@ -56,14 +56,19 @@ namespace Debwin.Core.Views
         {
             //if (_filterPredicate != null && !_filterPredicate(message))
             //    return;
-
-            lock (_fileLock)
+            try
             {
-                _logWriter.WriteLogEntry(message, CancellationToken.None);
-                if (flushAfterWrite)
+                lock (_fileLock)
                 {
-                    _baseStream.Flush();
+                    _logWriter.WriteLogEntry(message, CancellationToken.None);
+                    if (flushAfterWrite)
+                    {
+                        _baseStream.Flush();
+                    }
                 }
+            }
+            catch (ThreadAbortException)
+            {
             }
         }
 

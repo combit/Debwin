@@ -1619,14 +1619,14 @@ namespace Debwin.UI.Panels
 
         private void SetupLongTermMonitoring()
         {
-            string hour = DateTime.Now.ToString("HH");
-            Util.TaskScheduler.Instance.ScheduleTask(Convert.ToInt32(hour) + 1, 0, 1,  // Create a logfile every hour
+            DateTime in15Min = DateTime.Now.AddMinutes(15);
+            Util.TaskScheduler.Instance.ScheduleTask(in15Min.Hour, in15Min.Minute, 15,  // Create a logfile every 15 minutes
             () =>
             {
                 if (_userPreferences.EnableLongTermMonitoring)
                 {
                     string currentDateTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm");
-                    string path = _userPreferences.LogFilePath + string.Format("{0}-{1}.log4", LogController.Name, currentDateTime);
+                    string path = Path.Combine(_userPreferences.LogFilePath, string.Format("{0}-{1}.log4", LogController.Name, currentDateTime));
                     var attachedFileWriter = _logController.GetLogViews().OfType<FileBasedLogView>().FirstOrDefault();
                     if (attachedFileWriter != null)
                     {
@@ -1639,7 +1639,7 @@ namespace Debwin.UI.Panels
                         if (logView != null)
                         {
                             SaveLogDialog saveLogDialog = new SaveLogDialog(logView, true, null, null, null);
-                            saveLogDialog.LogFilePath = _userPreferences.LogFilePath + string.Format("{0}-{1}.log4", LogController.Name, currentDateTime);
+                            saveLogDialog.LogFilePath = Path.Combine(_userPreferences.LogFilePath, string.Format("{0}-{1}.log4", LogController.Name, currentDateTime));
                             saveLogDialog.ShowDialog();
                             this.Invoke(new Action(() => this.ClearLogViews()));
                         }

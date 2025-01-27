@@ -13,7 +13,7 @@ namespace Debwin.UI.Util
 
         public static TaskScheduler Instance => _instance ?? (_instance = new TaskScheduler());
 
-        public void ScheduleTask(int hour, int min, double intervalInHour, Action task)
+        public void ScheduleTask(int hour, int min, double intervalInMinutes, Action task)
         {
             DateTime now = DateTime.Now;
             DateTime firstRun = new DateTime(now.Year, now.Month, now.Day, hour, min, 0, 0);
@@ -31,7 +31,7 @@ namespace Debwin.UI.Util
             var timer = new Timer(x =>
             {
                 task.Invoke();
-            }, null, timeToGo, TimeSpan.FromHours(intervalInHour));
+            }, null, timeToGo, TimeSpan.FromMinutes(intervalInMinutes));
 
             _timers.Add(timer);
         }
