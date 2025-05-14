@@ -2,36 +2,104 @@
 
 namespace Debwin.Core
 {
+    public enum LogLevel
+    {
+        Debug = 1,
+        Info = 2,
+        Warning = 3,
+        Error = 4,
+
+        /* Debwin4-Internal */
+        UserComment = 100
+    }
+
+    /// <summary>
+    /// IDs of known properties of log messages. Not each message type has all properties!
+    /// </summary>
+    public static class PropertyIdentifiers
+    {
+        public const int PROPERTY_CPU_NR = 101;
+
+        public const int PROPERTY_LEVEL = 3;
+
+        public const int PROPERTY_LINE_NR = 6;
+
+        public const int PROPERTY_LOGGER_NAME = 5;
+
+        public const int PROPERTY_MESSAGE = 2;
+
+        // Optional
+        public const int PROPERTY_MODULE_NAME = 100;
+
+        public const int PROPERTY_THREAD = 4;
+
+        // Default
+        public const int PROPERTY_TIMESTAMP = 1;
+
+        public const int PROPERTY_USER_PRINCIPAL = 102;
+    }
 
     public class LogMessage
     {
-
         public const int TYPECODE_DEFAULT_MESSAGE = 1;
 
+        public bool IsBookmark;
+        public LogLevel Level;
         public int LineNr = -1;
 
-        public LogMessage() { }
+        public string LoggerName;
+
+        public string Message;
+
+        public int RelativeTime = 0;
+
+        public string Thread;
+
+        public DateTime Timestamp;
+
+        public LogMessage()
+        { }
 
         public LogMessage(string message)
         {
             this.Message = message;
         }
 
+        public LogMessage(LogMessage other)
+        {
+            this.Timestamp = other.Timestamp;
+            this.RelativeTime = other.RelativeTime;
+            this.Message = other.Message;
+            this.Level = other.Level;
+            this.Thread = other.Thread;
+            this.LoggerName = other.LoggerName;
+            this.LineNr = other.LineNr;
+        }
+
         /* For fast searches over millions of messages, we don`t want to have the overhead of calling a getter function for every message -> make the raw variables public */
 
-        public DateTime Timestamp;
+        public virtual LogMessage Clone()
+        {
+            return new LogMessage(this);
+        }
 
-        public int RelativeTime = 0;
+        /// <summary>
+        /// Gets the IDs of all custom properties available for this message type, so the log writers (<see cref="LogWriters.ILogWriter"/>) can add these
+        /// properties when writing the captured messages to a log file.
+        /// </summary>
+        public virtual int[] GetCustomPropertyIDs()
+        {
+            return new int[0];
+        }
 
-        public string Message;
-
-        public LogLevel Level;
-
-        public string Thread;
-
-        public string LoggerName;
-
-        public bool IsBookmark;
+        /// <summary>
+        /// Returns a number that identifies the LogMessage type. This allows faster type checks than using Object.GetType()/Reflection when writing and parsing log messages.
+        /// Child classes must override this with an own unique type code. New type codes should also be registered at the <see cref="LogMessageFactory"/>.
+        /// </summary>
+        public virtual int GetMessageTypeCode()
+        {
+            return TYPECODE_DEFAULT_MESSAGE;
+        }
 
         /// <summary>
         /// Returns the message property associated with the specified property ID or null, if this message type does not have that property.
@@ -42,14 +110,19 @@ namespace Debwin.Core
             {
                 case PropertyIdentifiers.PROPERTY_TIMESTAMP:
                     return Timestamp;
+
                 case PropertyIdentifiers.PROPERTY_MESSAGE:
                     return Message;
+
                 case PropertyIdentifiers.PROPERTY_LEVEL:
                     return Level;
+
                 case PropertyIdentifiers.PROPERTY_THREAD:
                     return Thread;
+
                 case PropertyIdentifiers.PROPERTY_LOGGER_NAME:
                     return LoggerName;
+
                 case PropertyIdentifiers.PROPERTY_LINE_NR:
                     return LineNr;
 
@@ -58,16 +131,32 @@ namespace Debwin.Core
             return null;
         }
 
-        // See GetProperty().
-        public virtual void SetProperty(int propertyIdentifier, object value) { }
-
-        /// <summary>
-        /// Gets the IDs of all custom properties available for this message type, so the log writers (<see cref="LogWriters.ILogWriter"/>) can add these
-        /// properties when writing the captured messages to a log file.
-        /// </summary>
-        public virtual int[] GetCustomPropertyIDs()
+        /// <summary>Returns metadata for the supported properties of this message type, or null if the property ID is unknown.</summary>
+        public virtual LogMessagePropertyInfo GetPropertyMetadata(int propertyID)
         {
-            return new int[0];
+            switch (propertyID)
+            {
+                case PropertyIdentifiers.PROPERTY_TIMESTAMP:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_TIMESTAMP, "Date/Time", typeof(DateTime));
+
+                case PropertyIdentifiers.PROPERTY_MESSAGE:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_MESSAGE, "Message", typeof(string));
+
+                case PropertyIdentifiers.PROPERTY_LEVEL:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LEVEL, "Level", typeof(LogLevel));
+
+                case PropertyIdentifiers.PROPERTY_THREAD:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_THREAD, "Thread", typeof(string));
+
+                case PropertyIdentifiers.PROPERTY_LOGGER_NAME:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LOGGER_NAME, "Logger", typeof(string));
+
+                case PropertyIdentifiers.PROPERTY_LINE_NR:
+                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LINE_NR, "Line", typeof(int));
+
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
@@ -86,45 +175,16 @@ namespace Debwin.Core
             };
         }
 
-        /// <summary>
-        /// Returns a number that identifies the LogMessage type. This allows faster type checks than using Object.GetType()/Reflection when writing and parsing log messages.
-        /// Child classes must override this with an own unique type code. New type codes should also be registered at the <see cref="LogMessageFactory"/>.
-        /// </summary>
-        public virtual int GetMessageTypeCode()
-        {
-            return TYPECODE_DEFAULT_MESSAGE;
-        }
-
-        /// <summary>Returns metadata for the supported properties of this message type, or null if the property ID is unknown.</summary>
-        public virtual LogMessagePropertyInfo GetPropertyMetadata(int propertyID)
-        {
-            switch (propertyID)
-            {
-                case PropertyIdentifiers.PROPERTY_TIMESTAMP:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_TIMESTAMP, "Date/Time", typeof(DateTime));
-                case PropertyIdentifiers.PROPERTY_MESSAGE:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_MESSAGE, "Message", typeof(string));
-                case PropertyIdentifiers.PROPERTY_LEVEL:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LEVEL, "Level", typeof(LogLevel));
-                case PropertyIdentifiers.PROPERTY_THREAD:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_THREAD, "Thread", typeof(string));
-                case PropertyIdentifiers.PROPERTY_LOGGER_NAME:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LOGGER_NAME, "Logger", typeof(string));
-                case PropertyIdentifiers.PROPERTY_LINE_NR:
-                    return new LogMessagePropertyInfo(PropertyIdentifiers.PROPERTY_LINE_NR, "Line", typeof(int));
-                default:
-                    return null;
-            }
-        }
-
+        // See GetProperty().
+        public virtual void SetProperty(int propertyIdentifier, object value)
+        { }
     }
 
     public class LogMessagePropertyInfo
     {
+        public Type DataType { get; private set; }
         public int PropertyID { get; private set; }
         public string UIName { get; private set; }
-        public Type DataType { get; private set; }
-
 
         public LogMessagePropertyInfo(int propertyID, string uiName, Type dataType)
         {
@@ -133,36 +193,4 @@ namespace Debwin.Core
             this.DataType = dataType;
         }
     }
-
-    public enum LogLevel
-    {
-        Debug = 1,
-        Info = 2,
-        Warning = 3,
-        Error = 4,
-
-        /* Debwin4-Internal */
-        UserComment = 100
-    }
-
-    /// <summary>
-    /// IDs of known properties of log messages. Not each message type has all properties!
-    /// </summary>
-    public static class PropertyIdentifiers
-    {
-        // Default
-        public const int PROPERTY_TIMESTAMP = 1;
-        public const int PROPERTY_MESSAGE = 2;
-        public const int PROPERTY_LEVEL = 3;
-        public const int PROPERTY_THREAD = 4;
-        public const int PROPERTY_LOGGER_NAME = 5;
-        public const int PROPERTY_LINE_NR = 6;
-
-        // Optional
-        public const int PROPERTY_MODULE_NAME = 100;
-        public const int PROPERTY_CPU_NR = 101;
-        public const int PROPERTY_USER_PRINCIPAL = 102;
-    }
-
-
 }

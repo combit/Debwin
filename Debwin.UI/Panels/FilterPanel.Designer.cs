@@ -193,7 +193,7 @@
             this.txtLogger.Name = "txtLogger";
             this.txtLogger.Size = new System.Drawing.Size(661, 23);
             this.txtLogger.TabIndex = 13;
-            this.toolTip1.SetToolTip(this.txtLogger, "Separate multiple values with ; and exlude with !\r\nExamples:\r\nShow only A and B -" +
+            this.toolTip1.SetToolTip(this.txtLogger, "Separate multiple values with ; and exclude with !\r\nExamples:\r\nShow only A and B -" +
         "-> A;B\r\nShow all but A and B --> !A;B");
             // 
             // lblLoggerName
@@ -255,6 +255,9 @@
             this.txtThread.Name = "txtThread";
             this.txtThread.Size = new System.Drawing.Size(661, 23);
             this.txtThread.TabIndex = 18;
+            this.toolTip1.SetToolTip(this.txtThread, "Separate multiple values with ; and exclude with !\r\nExamples:\r\nShow only A and B -" +
+        "-> A;B\r\nShow all but A and B --> !A;B");
+
             // 
             // label7
             // 

@@ -1,5 +1,8 @@
 ﻿using Debwin.Core.Parsers;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Debwin.Core.MessageSources
 {
@@ -27,6 +30,39 @@ namespace Debwin.Core.MessageSources
 
         protected IMessageCollectorObserver Observer { get { return _observer; } }
 
+        private static string NormalizeNewlines(string input)
+        {
+            if (!input.Contains('\r'))
+            {
+                return input;
+            }
+
+            StringBuilder builder = new StringBuilder(input.Length);
+            int length = input.Length;
+
+            for (int i = 0; i < length; i++)
+            {
+                char current = input[i];
+
+                if (current == '\r')
+                {
+                    builder.Append('\n');
+
+                    // Skip the '\n' in a CRLF sequence
+                    if (i + 1 < length && input[i + 1] == '\n')
+                    {
+                        i++;
+                    }
+                }
+                else
+                {
+                    builder.Append(current);
+                }
+            }
+
+            return builder.ToString();
+        }
+
         public void NotifyNewRawMessage(object rawMessage)
         {
             if (_observer == null)
@@ -36,9 +72,32 @@ namespace Debwin.Core.MessageSources
 
             if (message != null)   // notify controller that new message is available
             {
-                _currentLineNr++;
-                message.LineNr = _currentLineNr;
-                _observer.NotifyNewLogMessage(this, message);
+                message.Message = NormalizeNewlines(message.Message);
+
+                // Determine the lines to process: if there are no newline characters, use the original message.
+                string[] lines = message.Message.IndexOf('\n') < 0
+                    ? new[] { message.Message }
+                    : message.Message.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (lines.Length > 0)
+                {
+                    // Use the original message for the first line.
+                    message.Message = lines[0];
+                    _currentLineNr++;
+                    message.LineNr = _currentLineNr;
+                    _observer.NotifyNewLogMessage(this, message);
+
+                    // For each additional line, create a copy via the Clone method.
+                    for (int i = 1; i < lines.Length; i++)
+                    {
+                        // Assume Message has a copy constructor.
+                        var newMessage = message.Clone();
+                        newMessage.Message = lines[i];
+                        _currentLineNr++;
+                        newMessage.LineNr = _currentLineNr;
+                        _observer.NotifyNewLogMessage(this, newMessage);
+                    }
+                }
             }
         }
 

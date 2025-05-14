@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 13.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 17
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debwin.Core", "Debwin.Core\Debwin.Core.csproj", "{83FADAC9-D0DA-40B8-8EB2-96E1467B86AA}"
 EndProject

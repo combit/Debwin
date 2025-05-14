@@ -27,8 +27,6 @@ namespace Debwin.Core
 
         public DateTime? TimeUntil { get; set; }
 
-        public string Thread { get; set; }
-
         public List<FilterCriterion> Criteria { get; set; }
 
         public void AddCriterion(int propertyId, FilterOperator @operator, string expectedValues)
@@ -130,15 +128,6 @@ namespace Debwin.Core
                 int timeMax = MaxTimeDifference;
                 var oldPredicate = currentPredicate;
                 currentPredicate = (msg => oldPredicate(msg) && msg.RelativeTime <= timeMax || msg.Level == LogLevel.UserComment);
-            }
-
-            // Thread
-            if (!string.IsNullOrEmpty(Thread))
-            {
-                var oldPredicate = currentPredicate;
-
-                currentPredicate = (msg => oldPredicate(msg) && msg.Thread == Thread || msg.Level == LogLevel.UserComment);
-
             }
 
             // Other criteria:

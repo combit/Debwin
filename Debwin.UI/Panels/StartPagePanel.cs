@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
+using System.Threading;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -27,11 +28,11 @@ namespace Debwin.UI.Panels
         private const int WM_USER = 0x0400;
         private const int WM_USER_DEBWIN4_LOGCRM = WM_USER + 1;
 
-        private readonly IMainWindow _mainWindow;
+        private static bool _hasProcessedCommandLineArgs;
         private readonly IDebwinController _debwinController;
+        private readonly IMainWindow _mainWindow;
         private readonly IUserPreferences _userPreferences;
         private CustomWin32Window _externalMessageListener;
-        private static bool _hasProcessedCommandLineArgs;
 
         public StartPagePanel(IMainWindow mainWindow, IDebwinController debwinController, IUserPreferences userPreferences)
         {
@@ -56,12 +57,142 @@ namespace Debwin.UI.Panels
             }
         }
 
+        public static void OpenLogFromClipboard(IMainWindow mainWindow)
+        {
+            string content = Clipboard.GetText(TextDataFormat.UnicodeText);
+            if (String.IsNullOrEmpty(content))
+            {
+                MessageBox.Show("Clipboard is empty", "Debwin4", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var tempFile = Path.ChangeExtension(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), ".log4");
+            File.WriteAllText(tempFile, content);
+            var controller = TryOpenFile(mainWindow, tempFile, true);
+            if (controller != null)
+                controller.Name = "Clipboard";
+        }
+
+        /// <summary>
+        /// Shows the Open-Log dialog for the given file path and returns the created log controller or null, if the operation was canceled.
+        /// </summary>
+        /// <param name="deleteFileAfterLoading"><see cref="FileMessageSource.DeleteFileOnClose"/></param>
+        /// <returns></returns>
+        public static ILogController TryOpenFile(IMainWindow mainWindow, string defaultFilePath, bool deleteFileAfterLoading)
+        {
+            var newFileSourceDialog = new CreateFileSourceDialog(defaultFilePath);
+            if (mainWindow.ShowDialogEx(newFileSourceDialog) == DialogResult.OK)
+            {
+                FileMessageSource fileMessageSource = newFileSourceDialog.Result.Item1;
+                fileMessageSource.DeleteFileOnClose = deleteFileAfterLoading;
+                IMessageParser parser = newFileSourceDialog.Result.Item2;
+                ILogController controller = DebwinController.GetNewLogController(mainWindow.GetDebwinController(), fileMessageSource.GetName(), fileMessageSource, parser);
+                var rootView = new MemoryBasedLogView(-1);
+                controller.AddView(rootView);
+                mainWindow.OpenNewLogView(controller, rootView, new LogViewPanelOptions() { LiveCaptureMode = false });
+                controller.GetMessageCollectors().First().Start();
+                return controller;
+            }
+
+            return null;
+        }
+
+        private void btnOpenFromClipboard_Click(object sender, EventArgs e)
+        {
+            OpenLogFromClipboard(_mainWindow);
+        }
+
+        private void btnOpenLogFile_Click(object sender, EventArgs e)
+        {
+            TryOpenFile(_mainWindow, null, false);
+        }
+
+        private void btnOpenLogFile_DragDrop(object sender, DragEventArgs e)
+        {
+            btnOpenLogFile.BackColor = SystemColors.ControlLight;
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (var filePath in files)
+            {
+                TryOpenFile(_mainWindow, filePath, false);
+            }
+        }
+
+        private void btnOpenLogFile_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+                btnOpenLogFile.BackColor = Color.Azure;
+            }
+        }
+
+        private void btnOpenLogFile_DragLeave(object sender, EventArgs e)
+        {
+            btnOpenLogFile.BackColor = SystemColors.ControlLight;
+        }
+
+        private void btnStartCrmLog_Click(object sender, EventArgs e)
+        {
+            var defaultColumns = GetDefaultListLabelLogColumns();
+            var logController = new LogController() { Name = "cRM" };
+            _debwinController.AddLogController(logController);
+
+            // randomize the port in order to support terminal server environments
+            int port = UdpMessageSource.GetAvailablePort();
+
+            // cRM uses a specialized message collector which handles the cRM-specific control messages
+            var messageCollector = new CRMMessageCollector() { Source = new CombitUdpMessageSource() { Port = port }, Parser = new ListLabelBinaryMessageParser(), LogFilePath = _userPreferences.LogFilePath, EnableLongTermMonitoring = _userPreferences.EnableLongTermMonitoring };
+            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
+            logController.AddView(rootView);
+            logController.AddMessageCollector(messageCollector);
+
+            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions() { DefaultColumns = defaultColumns, LiveCaptureMode = true });
+            messageCollector.Start();
+        }
+
+        private void btnStartLLCPLog_Click(object sender, EventArgs e)
+        {
+            var logController = InitializeLogController("LL Cross Platform", 29200);
+            StartLogController(logController);
+
+            using (var processStartedEvent = new EventWaitHandle(false, EventResetMode.AutoReset, "Global\\Debwin4StartedEvent"))
+            {
+                processStartedEvent.Set();
+            }
+        }
+
+        private void btnStartLLLog_Click(object sender, EventArgs e)
+        {
+            var defaultColumns = GetDefaultListLabelLogColumns();
+            var logController = DebwinController.GetNewLogController(_debwinController, "List & Label", new CombitUdpMessageSource() { Port = 9174 }, new ListLabelBinaryMessageParser());
+            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
+            logController.AddView(rootView);
+            rootView.EnableLogToFileOnOverflow(logController, Path.Combine(_userPreferences.LogFilePath, "ListLabel.log4"));
+            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions() { DefaultColumns = defaultColumns, LiveCaptureMode = true });
+            logController.GetMessageCollectors().First().Start();
+        }
+
+        private void btnStartRSLog_Click(object sender, EventArgs e)
+        {
+            var logController = InitializeLogController("Report Server", 4791);
+            StartLogController(logController);
+
+            // Add additional Source+Parser for default debugging of LL (for LL jobs without a .NET logger)
+            var nativeMessageCollector = new DefaultMessageCollector()
+            {
+                Source = new CombitUdpMessageSource() { Port = 9174 },
+                Parser = new ListLabelBinaryMessageParser()
+            };
+
+            logController.AddMessageCollector(nativeMessageCollector);
+            nativeMessageCollector.Start();
+        }
+
         /// <summary>Handles messages that the panel receives from other applications, e.g. commands from the cRM.</summary>
         private IntPtr ExternalMessageListener(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
             if (msg == WM_USER_DEBWIN4_LOGCRM)    // Sent by the cRM to start logging
             {
-
                 // LL (stand-alone or within the RS) and the cRM use the same port as they all use the same mem-mapped file to publish the port  -> only one can be active
                 foreach (ILogController logControl in _debwinController.GetLogControllers())
                 {
@@ -106,62 +237,96 @@ namespace Debwin.UI.Panels
                         msgCollector.Start();
                     }
                 }
-
             }
             return IntPtr.Zero;
         }
 
-        private void btnOpenLogFile_DragEnter(object sender, DragEventArgs e)
+        private LogViewPanelColumnSet GetDefaultListLabelLogColumns()
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effect = DragDropEffects.Copy;
-                btnOpenLogFile.BackColor = Color.Azure;
-            }
+            var columns = new List<LogViewPanelColumnDefinition>()
+                {
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LEVEL, 25),
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MODULE_NAME, 80),
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LOGGER_NAME, 120),
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_THREAD, 60),
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_TIMESTAMP, 170),
+                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MESSAGE, 350)
+                };
+
+            return new LogViewPanelColumnSet() { Columns = columns };
         }
 
-        private void btnOpenLogFile_DragDrop(object sender, DragEventArgs e)
+        private ILogController InitializeLogController(string logSourceName, int udpPort)
         {
-            btnOpenLogFile.BackColor = SystemColors.ControlLight;
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (var filePath in files)
+            var defaultColumns = new LogViewPanelColumnSet()
             {
-                TryOpenFile(_mainWindow, filePath, false);
-            }
-        }
+                Columns = new List<LogViewPanelColumnDefinition>()
+                    {
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LEVEL, 25),
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_USER_PRINCIPAL, 150),
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LOGGER_NAME, 120),
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_THREAD, 60),
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_TIMESTAMP, 170),
+                        new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MESSAGE, 350)
+                    }
+            };
 
-        /// <summary>
-        /// Shows the Open-Log dialog for the given file path and returns the created log controller or null, if the operation was canceled.
-        /// </summary>
-        /// <param name="deleteFileAfterLoading"><see cref="FileMessageSource.DeleteFileOnClose"/></param>
-        /// <returns></returns>
-        public static ILogController TryOpenFile(IMainWindow mainWindow, string defaultFilePath, bool deleteFileAfterLoading)
-        {
-            var newFileSourceDialog = new CreateFileSourceDialog(defaultFilePath);
-            if (mainWindow.ShowDialogEx(newFileSourceDialog) == DialogResult.OK)
-            {
-                FileMessageSource fileMessageSource = newFileSourceDialog.Result.Item1;
-                fileMessageSource.DeleteFileOnClose = deleteFileAfterLoading;
-                IMessageParser parser = newFileSourceDialog.Result.Item2;
-                ILogController controller = DebwinController.GetNewLogController(mainWindow.GetDebwinController(), fileMessageSource.GetName(), fileMessageSource, parser);
-                var rootView = new MemoryBasedLogView(-1);
-                controller.AddView(rootView);
-                mainWindow.OpenNewLogView(controller, rootView, new LogViewPanelOptions() { LiveCaptureMode = false });
-                controller.GetMessageCollectors().First().Start();
-                return controller;
-            }
+            var logController = DebwinController.GetNewLogController(
+                _debwinController,
+                logSourceName,
+                new UdpMessageSource() { Port = udpPort },
+                new Debwin4CsvParser() { CheckForMissingVersionHeader = false, LogFormatVersion = 1 }
+            );
 
-            return null;
-        }
-
-        private void btnOpenLogFile_DragLeave(object sender, EventArgs e)
-        {
-            btnOpenLogFile.BackColor = SystemColors.ControlLight;
+            return logController;
         }
 
         private bool IsElevatedUser()
         {
             return WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid);
+        }
+
+        private void StartLogController(ILogController logController)
+        {
+            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
+            logController.AddView(rootView);
+
+            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions()
+            {
+                DefaultColumns = new LogViewPanelColumnSet()
+                {
+                    Columns = new List<LogViewPanelColumnDefinition>()
+            {
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LEVEL, 25),
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_USER_PRINCIPAL, 150),
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LOGGER_NAME, 120),
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_THREAD, 60),
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_TIMESTAMP, 170),
+                new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MESSAGE, 350)
+            }
+                },
+                LiveCaptureMode = true
+            });
+
+            logController.GetMessageCollectors().First().Start();
+        }
+
+        private void StartPagePanel_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (_externalMessageListener != null)
+            {
+                _externalMessageListener.Dispose();
+                _externalMessageListener = null;
+            }
+        }
+
+        private void StartPagePanel_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.V   // Paste Shortcut
+               || e.Shift && e.KeyCode == Keys.Insert)
+            {
+                OpenLogFromClipboard(_mainWindow);
+            }
         }
 
         private void StartPagePanel_Load(object sender, EventArgs e)
@@ -198,124 +363,6 @@ namespace Debwin.UI.Panels
                         }
                     }
                 }
-            }
-        }
-
-        private void btnStartLLLog_Click(object sender, EventArgs e)
-        {
-            var defaultColumns = GetDefaultListLabelLogColumns();
-            var logController = DebwinController.GetNewLogController(_debwinController, "List & Label", new CombitUdpMessageSource() { Port = 9174 }, new ListLabelBinaryMessageParser());
-            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
-            logController.AddView(rootView);
-            rootView.EnableLogToFileOnOverflow(logController, Path.Combine(_userPreferences.LogFilePath, "ListLabel.log4"));
-            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions() { DefaultColumns = defaultColumns, LiveCaptureMode = true });
-            logController.GetMessageCollectors().First().Start();
-        }
-
-        private LogViewPanelColumnSet GetDefaultListLabelLogColumns()
-        {
-            var columns = new List<LogViewPanelColumnDefinition>()
-                {
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LEVEL, 25),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MODULE_NAME, 80),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LOGGER_NAME, 120),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_THREAD, 60),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_TIMESTAMP, 170),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MESSAGE, 350)
-                };
-
-            return new LogViewPanelColumnSet() { Columns = columns };
-        }
-
-        private void btnStartRSLog_Click(object sender, EventArgs e)
-        {
-            var defaultColumns = new LogViewPanelColumnSet()
-            {
-                Columns = new List<LogViewPanelColumnDefinition>()
-                {
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LEVEL, 25),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_USER_PRINCIPAL, 150),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_LOGGER_NAME, 120),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_THREAD, 60),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_TIMESTAMP, 170),
-                    new LogViewPanelColumnDefinition(PropertyIdentifiers.PROPERTY_MESSAGE, 350)
-                }
-            };
-            var logController = DebwinController.GetNewLogController(_debwinController, "Report Server", new UdpMessageSource() { Port = 4791 }, new Debwin4CsvParser() { CheckForMissingVersionHeader = false, LogFormatVersion = 1 });
-            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
-            logController.AddView(rootView);
-
-            // Source+Parser for NLog messages from Report Server:
-            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions() { DefaultColumns = defaultColumns, LiveCaptureMode = true });
-            logController.GetMessageCollectors().First().Start();
-
-            // Add additional Source+Parser for default debugging of LL (for LL jobs without a .NET logger)
-            var nativeMessageCollector = new DefaultMessageCollector() { Source = new CombitUdpMessageSource() { Port = 9174 }, Parser = new ListLabelBinaryMessageParser() };
-            logController.AddMessageCollector(nativeMessageCollector);
-            nativeMessageCollector.Start();
-        }
-
-        private void btnStartCrmLog_Click(object sender, EventArgs e)
-        {
-            var defaultColumns = GetDefaultListLabelLogColumns();
-            var logController = new LogController() { Name = "cRM" };
-            _debwinController.AddLogController(logController);
-
-            // randomize the port in order to support terminal server environments
-            int port = UdpMessageSource.GetAvailablePort();
-
-            // cRM uses a specialized message collector which handles the cRM-specific control messages
-            var messageCollector = new CRMMessageCollector() { Source = new CombitUdpMessageSource() { Port = port }, Parser = new ListLabelBinaryMessageParser(), LogFilePath = _userPreferences.LogFilePath, EnableLongTermMonitoring = _userPreferences.EnableLongTermMonitoring };
-            var rootView = new MemoryBasedLogView(_userPreferences.MaximumMessageCount);
-            logController.AddView(rootView);
-            logController.AddMessageCollector(messageCollector);
-
-            _mainWindow.OpenNewLogView(logController, rootView, new LogViewPanelOptions() { DefaultColumns = defaultColumns, LiveCaptureMode = true });
-            messageCollector.Start();
-        }
-
-        private void btnOpenLogFile_Click(object sender, EventArgs e)
-        {
-            TryOpenFile(_mainWindow, null, false);
-        }
-
-        private void StartPagePanel_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Control && e.KeyCode == Keys.V   // Paste Shortcut
-               || e.Shift && e.KeyCode == Keys.Insert)
-            {
-                OpenLogFromClipboard(_mainWindow);
-            }
-        }
-
-        public static void OpenLogFromClipboard(IMainWindow mainWindow)
-        {
-            string content = Clipboard.GetText(TextDataFormat.UnicodeText);
-            if (String.IsNullOrEmpty(content))
-            {
-                MessageBox.Show("Clipboard is empty", "Debwin4", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var tempFile = Path.ChangeExtension(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()), ".log4");
-            File.WriteAllText(tempFile, content);
-            var controller = TryOpenFile(mainWindow, tempFile, true);
-            if (controller != null)
-                controller.Name = "Clipboard";
-
-        }
-
-        private void btnOpenFromClipboard_Click(object sender, EventArgs e)
-        {
-            OpenLogFromClipboard(_mainWindow);
-        }
-
-        private void StartPagePanel_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (_externalMessageListener != null)
-            {
-                _externalMessageListener.Dispose();
-                _externalMessageListener = null;
             }
         }
     }

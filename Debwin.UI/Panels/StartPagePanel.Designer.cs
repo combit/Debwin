@@ -37,6 +37,7 @@
             this.btnOpenFromClipboard = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.btnStartLLCPLog = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -72,7 +73,7 @@
             this.label2.Location = new System.Drawing.Point(3, 15);
             this.label2.Margin = new System.Windows.Forms.Padding(3, 15, 3, 5);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(103, 32);
+            this.label2.Size = new System.Drawing.Size(102, 32);
             this.label2.TabIndex = 1;
             this.label2.Text = "Debwin4";
             // 
@@ -85,11 +86,11 @@
             this.btnStartRSLog.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnStartRSLog.Font = new System.Drawing.Font("Segoe UI Light", 12F);
             this.btnStartRSLog.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.btnStartRSLog.Location = new System.Drawing.Point(732, 6);
+            this.btnStartRSLog.Location = new System.Drawing.Point(831, 6);
             this.btnStartRSLog.Margin = new System.Windows.Forms.Padding(6);
             this.btnStartRSLog.Name = "btnStartRSLog";
             this.btnStartRSLog.Padding = new System.Windows.Forms.Padding(5);
-            this.btnStartRSLog.Size = new System.Drawing.Size(365, 97);
+            this.btnStartRSLog.Size = new System.Drawing.Size(266, 97);
             this.btnStartRSLog.TabIndex = 2;
             this.btnStartRSLog.Text = "Capture Report Server Log";
             this.btnStartRSLog.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -108,7 +109,7 @@
             this.btnStartLLLog.Location = new System.Drawing.Point(6, 6);
             this.btnStartLLLog.Margin = new System.Windows.Forms.Padding(6);
             this.btnStartLLLog.Name = "btnStartLLLog";
-            this.btnStartLLLog.Size = new System.Drawing.Size(351, 97);
+            this.btnStartLLLog.Size = new System.Drawing.Size(263, 97);
             this.btnStartLLLog.TabIndex = 3;
             this.btnStartLLLog.Text = "Capture List & Label Log";
             this.btnStartLLLog.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -117,12 +118,14 @@
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 34F));
-            this.tableLayoutPanel1.Controls.Add(this.btnStartCrmLog, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnStartRSLog, 2, 0);
+            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel1.Controls.Add(this.btnStartLLCPLog, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnStartCrmLog, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.btnStartRSLog, 3, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnStartLLLog, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 55);
@@ -141,11 +144,11 @@
             this.btnStartCrmLog.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnStartCrmLog.Font = new System.Drawing.Font("Segoe UI Light", 12F);
             this.btnStartCrmLog.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.btnStartCrmLog.Location = new System.Drawing.Point(369, 6);
+            this.btnStartCrmLog.Location = new System.Drawing.Point(556, 6);
             this.btnStartCrmLog.Margin = new System.Windows.Forms.Padding(6);
             this.btnStartCrmLog.Name = "btnStartCrmLog";
             this.btnStartCrmLog.Padding = new System.Windows.Forms.Padding(5);
-            this.btnStartCrmLog.Size = new System.Drawing.Size(351, 97);
+            this.btnStartCrmLog.Size = new System.Drawing.Size(263, 97);
             this.btnStartCrmLog.TabIndex = 6;
             this.btnStartCrmLog.Text = "Capture combit CRM Log";
             this.btnStartCrmLog.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -204,6 +207,25 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(1109, 627);
             this.tableLayoutPanel3.TabIndex = 6;
             // 
+            // btnStartLLCPLog
+            // 
+            this.btnStartLLCPLog.AllowDrop = true;
+            this.btnStartLLCPLog.BackColor = System.Drawing.Color.Honeydew;
+            this.btnStartLLCPLog.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnStartLLCPLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnStartLLCPLog.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnStartLLCPLog.Font = new System.Drawing.Font("Segoe UI Light", 12F);
+            this.btnStartLLCPLog.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.btnStartLLCPLog.Location = new System.Drawing.Point(281, 6);
+            this.btnStartLLCPLog.Margin = new System.Windows.Forms.Padding(6);
+            this.btnStartLLCPLog.Name = "btnStartLLCPLog";
+            this.btnStartLLCPLog.Size = new System.Drawing.Size(263, 97);
+            this.btnStartLLCPLog.TabIndex = 7;
+            this.btnStartLLCPLog.Text = "Capture List & Label Cross Platform Log";
+            this.btnStartLLCPLog.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.btnStartLLCPLog.UseMnemonic = false;
+            this.btnStartLLCPLog.Click += new System.EventHandler(this.btnStartLLCPLog_Click);
+            // 
             // StartPagePanel
             // 
             this.AllowDrop = true;
@@ -240,5 +262,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label btnStartCrmLog;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Label btnStartLLCPLog;
     }
 }

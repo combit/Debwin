@@ -55,7 +55,7 @@ namespace Debwin.UI.Panels
 
             txtTextSearch.Text = filter.MessageTextFilter ?? String.Empty;
             txtLogger.Text = filter.LoggerNames ?? String.Empty;
-            txtThread.Text = filter.Thread ?? string.Empty;
+
             if (_userPreferences.TimeFormatMode == TimeFormatMode.RelativeTime)
             {
                 txtDateFrom.Text = filter.MinTimeDifference > 0 ? filter.MinTimeDifference.ToString() : string.Empty;
@@ -82,6 +82,12 @@ namespace Debwin.UI.Panels
                     {
                         txtModule.Text = criterion.ExpectedValues;
                     }
+
+                    if (criterion.PropertyId == PropertyIdentifiers.PROPERTY_THREAD && criterion.Operator == FilterOperator.StringIncludesOrExcludes)
+                    {
+                        txtThread.Text = criterion.ExpectedValues;
+                    }
+
                 }
             }
 
@@ -235,7 +241,7 @@ namespace Debwin.UI.Panels
             // Thread
             if (!string.IsNullOrEmpty(txtThread.Text))
             {
-                filter.Thread = txtThread.Text;
+                filter.AddCriterion(PropertyIdentifiers.PROPERTY_THREAD, FilterOperator.StringIncludesOrExcludes, txtThread.Text);
             }
 
             // Module
