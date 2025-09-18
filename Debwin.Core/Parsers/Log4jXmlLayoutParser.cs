@@ -26,7 +26,7 @@ namespace Debwin.Core.Parsers
             return new int[] { LogMessage.TYPECODE_DEFAULT_MESSAGE };
         }
 
-        public LogMessage CreateMessageFrom(object rawMessage)
+        public IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
             byte[] data = rawMessage as byte[];
             //int packageNr = (int)(rawMessage as object[])[0];
@@ -91,7 +91,7 @@ namespace Debwin.Core.Parsers
                         }
                     }
 
-                    return result;
+                    return new List<LogMessage>() { result };
                 }
             }
         }

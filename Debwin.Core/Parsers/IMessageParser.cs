@@ -12,7 +12,7 @@ namespace Debwin.Core.Parsers
         //Type[] GetSupportedInputTypes();
 
         /// <summary></summary>
-        LogMessage CreateMessageFrom(object rawMessage);
+        IList<LogMessage> CreateMessageFrom(object rawMessage);
 
         /// <summary>
         /// Returns a list of the LogMessage types that this parser might return, in form of the typecodes of those LogMessage sub types (<see cref="LogMessage.GetMessageTypeCode"/>).

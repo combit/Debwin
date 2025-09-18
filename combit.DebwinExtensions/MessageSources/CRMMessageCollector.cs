@@ -2,6 +2,7 @@
 using Debwin.Core.MessageSources;
 using Debwin.Core.Views;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -16,22 +17,22 @@ namespace combit.DebwinExtensions.MessageSources
         public string LogFilePath { get; set; }
         public bool EnableLongTermMonitoring { get; set; }
 
-        protected override LogMessage ParseRawMessage(object rawMessage)
+        protected override IList<LogMessage> ParseRawMessage(object rawMessage)
         {
-            LogMessage msg = base.ParseRawMessage(rawMessage);
+            IList<LogMessage> logMessages = base.ParseRawMessage(rawMessage);
 
-            if (msg == null)
-                return null;
+            if (logMessages == null ||logMessages[0] == null)
+                return new List<LogMessage>();
 
-            if (msg.Message == "Debwin.Command.ClearLogBufferAndFile" && EnableLongTermMonitoring == false)
+            if (logMessages[0] != null && logMessages[0].Message == "Debwin.Command.ClearLogBufferAndFile" && EnableLongTermMonitoring == false)
             {
                 // Send a handler through the pipeline that executes on all log views and clears them:
-                this.Observer.NotifyControlMessage(new ClearAllViewsOfControllerControlMessage(msg));
-                return null;
+                this.Observer.NotifyControlMessage(new ClearAllViewsOfControllerControlMessage(logMessages[0]));
+                return new List<LogMessage>();
             }
-            else if (msg.Message == "Debwin.Command.LogToFile")
+            else if (logMessages[0] != null && logMessages[0].Message == "Debwin.Command.LogToFile")
             {
-                this.Observer.NotifyControlMessage(ControlMessageFactory.CreateForLogController(msg, logController =>
+                this.Observer.NotifyControlMessage(ControlMessageFactory.CreateForLogController(logMessages[0], logController =>
                 {
                     if (logController.GetLogViews().Any(log => log is FileBasedLogView))   // do not attach a second file writer
                         return;
@@ -62,11 +63,11 @@ namespace combit.DebwinExtensions.MessageSources
 
                     logController.AddView(fileBasedLog);
                 }));
-                return null;
+                return new List<LogMessage>();
             }
 
 
-            return msg;
+            return logMessages;
         }
 
     }

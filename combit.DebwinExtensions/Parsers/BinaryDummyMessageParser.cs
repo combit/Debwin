@@ -9,11 +9,14 @@ namespace combit.DebwinExtensions.Parsers
 {
     public class BinaryDummyMessageParser : IMessageParser
     {
-        public LogMessage CreateMessageFrom(object rawMessage)
+        public IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
             var data = rawMessage as byte[];
 
-            return new LogMessage("received package, length: " + data.Length);
+            return new List<LogMessage>()
+            {
+                new LogMessage("received package, length: " + data.Length)
+            };
         }
 
         public IEnumerable<int> GetSupportedMessageTypeCodes()

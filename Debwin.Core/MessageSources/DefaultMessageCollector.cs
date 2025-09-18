@@ -66,59 +66,69 @@ namespace Debwin.Core.MessageSources
         public void NotifyNewRawMessage(object rawMessage)
         {
             if (_observer == null)
-                return;   // no need to process message if no observer is listening
+                return;   // no need to process logMessages if no observer is listening
 
-            LogMessage message = ParseRawMessage(rawMessage);
+            IList<LogMessage> logMessages = ParseRawMessage(rawMessage);
 
-            if (message != null)   // notify controller that new message is available
+            if (logMessages == null)
             {
-                message.Message = NormalizeNewlines(message.Message);
+                // might be the header line of a log file
+                return;
+            }
 
-                // Determine the lines to process: if there are no newline characters, use the original message.
-                string[] lines = message.Message.IndexOf('\n') < 0
-                    ? new[] { message.Message }
-                    : message.Message.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (lines.Length > 0)
+            foreach (var message in logMessages)
+            {
+                if (message != null)   // notify controller that new logMessages is available
                 {
-                    // Use the original message for the first line.
-                    message.Message = lines[0];
-                    _currentLineNr++;
-                    message.LineNr = _currentLineNr;
-                    _observer.NotifyNewLogMessage(this, message);
+                    message.Message = NormalizeNewlines(message.Message);
 
-                    // For each additional line, create a copy via the Clone method.
-                    for (int i = 1; i < lines.Length; i++)
+                    // Determine the lines to process: if there are no newline characters, use the original logMessages.
+                    string[] lines = message.Message.IndexOf('\n') < 0
+                        ? new[] { message.Message }
+                        : message.Message.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (lines.Length > 0)
                     {
-                        // Assume Message has a copy constructor.
-                        var newMessage = message.Clone();
-                        newMessage.Message = lines[i];
+                        // Use the original logMessages for the first line.
+                        message.Message = lines[0];
                         _currentLineNr++;
-                        newMessage.LineNr = _currentLineNr;
-                        _observer.NotifyNewLogMessage(this, newMessage);
+                        message.LineNr = _currentLineNr;
+                        _observer.NotifyNewLogMessage(this, message);
+
+                        // For each additional line, create a copy via the Clone method.
+                        for (int i = 1; i < lines.Length; i++)
+                        {
+                            // Assume Message has a copy constructor.
+                            var newMessage = message.Clone();
+                            newMessage.Message = lines[i];
+                            _currentLineNr++;
+                            newMessage.LineNr = _currentLineNr;
+                            _observer.NotifyNewLogMessage(this, newMessage);
+                        }
                     }
                 }
             }
         }
 
-        protected virtual LogMessage ParseRawMessage(object rawMessage)
+        protected virtual IList<LogMessage> ParseRawMessage(object rawMessage)
         {
             if (Parser == null && !(rawMessage is LogMessage))
                 throw new InvalidOperationException("ProcessRawMessage must not be called before setting the MessageParser.");
 
-            LogMessage message;
+            IList<LogMessage> logMessages;
 
             try
             {
-                message = Parser.CreateMessageFrom(rawMessage);
+                logMessages = Parser.CreateMessageFrom(rawMessage);
             }
             catch (Exception e)
             {
-                message = new LogMessage("Error while parsing raw message: " + e.ToString());
-                message.Level = LogLevel.Error;
+                LogMessage errorMessage = new LogMessage("Error while parsing raw logMessages: " + e.ToString());
+                errorMessage.Level = LogLevel.Error;
+                logMessages = new List<LogMessage> { errorMessage };
             }
 
-            return message;
+            return logMessages;
         }
 
         public void NotifyMessageSourceError(Exception e)

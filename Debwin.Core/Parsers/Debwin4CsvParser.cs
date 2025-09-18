@@ -42,7 +42,9 @@ namespace Debwin.Core.Parsers
             return LogMessageFactory.GetKnownMessageTypeCodes();
         }
 
-        public LogMessage CreateMessageFrom(object rawMessage)
+        private const char UdpLogSeparator = '\x1E'; // ASCII RS (Record Separator)
+
+        public IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
             messageNr++;
 
@@ -81,7 +83,28 @@ namespace Debwin.Core.Parsers
             // Version 1: Columns are defined in Debwin4CsvLogWriter.V1_COLUMN_HEADERS  ("[Dummmy];Timestamp;Level;Logger;Thread;Properties;Message")
             if (LogFormatVersion == 1 || !CheckForMissingVersionHeader)
             {
-                return ParseV1FormattedLine(csvLine);
+                List<LogMessage> logMessages = new List<LogMessage>();
+                if (csvLine.StartsWith(UdpLogSeparator.ToString()))
+                {
+                    string[] logLines = csvLine.Split(UdpLogSeparator);
+                    foreach (string line in logLines)
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            LogMessage msg = ParseV1FormattedLine(line);
+                            if (msg != null)
+                            {
+                                logMessages.Add(msg);
+                            }
+                        }
+                    }
+                }
+                else 
+                {
+                    logMessages.Add(ParseV1FormattedLine(csvLine));
+                }
+
+                return logMessages;
             }
 
             throw new NotImplementedException("Tried to read Debwin-CSV file of unknown version!");

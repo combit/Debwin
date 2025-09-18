@@ -60,7 +60,7 @@ namespace combit.DebwinExtensions.Parsers
             return new int[] { ListLabelLogMessage.TYPECODE_LL_MESSAGE };
         }
 
-        public virtual LogMessage CreateMessageFrom(object rawMessage)
+        public virtual IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
             try
             {
@@ -91,20 +91,26 @@ namespace combit.DebwinExtensions.Parsers
                     AdaptIndentation();
                 }
 
-                return new ListLabelLogMessage()
-                {
-                    Message = message,
-                    Thread = packet.ThreadID.ToString("X"),
-                    Level = (LogLevel)(int)Math.Max(1, packet.Severity),
-                    Timestamp = new DateTime(packet.Timestamp.wYear, packet.Timestamp.wMonth, packet.Timestamp.wDay, packet.Timestamp.wHour, packet.Timestamp.wMinute, packet.Timestamp.wSecond, packet.Timestamp.wMilliseconds, DateTimeKind.Local),
-                    ModuleName = string.Intern(packet.ModuleName),   // as we can have millions of messages, but only a few different module names, use string interning to save memory
-                    ProcessorNr = (int)packet.Processor,
-                    LoggerName = _llLogHelper.MapCategoryIndexToName(packet.Category)
+                return new List<LogMessage>() 
+                { 
+                    new ListLabelLogMessage() 
+                    {
+                        Message = message,
+                        Thread = packet.ThreadID.ToString("X"),
+                        Level = (LogLevel)(int)Math.Max(1, packet.Severity),
+                        Timestamp = new DateTime(packet.Timestamp.wYear, packet.Timestamp.wMonth, packet.Timestamp.wDay, packet.Timestamp.wHour, packet.Timestamp.wMinute, packet.Timestamp.wSecond, packet.Timestamp.wMilliseconds, DateTimeKind.Local),
+                        ModuleName = string.Intern(packet.ModuleName),   // as we can have millions of messages, but only a few different module names, use string interning to save memory
+                        ProcessorNr = (int)packet.Processor,
+                        LoggerName = _llLogHelper.MapCategoryIndexToName(packet.Category)
+                    }
                 };
             }
             catch (Exception e)
             {
-                return new LogMessage("Debwin-Error - Could not parse message: " + e.ToString()) { Level = LogLevel.Error };
+                return new List<LogMessage>()
+                {
+                    new LogMessage("Debwin-Error - Could not parse message: " + e.ToString()) { Level = LogLevel.Error }
+                };
             }
         }
 

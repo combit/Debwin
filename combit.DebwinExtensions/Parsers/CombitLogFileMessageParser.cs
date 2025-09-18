@@ -24,7 +24,7 @@ namespace combit.DebwinExtensions.Parsers
             return new int[] { ListLabelLogMessage.TYPECODE_LL_MESSAGE };
         }
 
-        public LogMessage CreateMessageFrom(object rawMessage)
+        public IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
             var msg = rawMessage as string;
             int msgType;
@@ -84,25 +84,29 @@ namespace combit.DebwinExtensions.Parsers
                 msgType = -1;
             }
 
+            List<LogMessage> logMessages = new List<LogMessage>();
             // Handle (-1) - Append to an earlier message or create unparsed message
             if (msgType == -1)
             {
-                return HandleNonStandardMessage(msg);
+                logMessages.Add(HandleNonStandardMessage(msg));
             }
-
-
             // Handle (1) and (2):
-            if (msgType == 0 || msgType == 1 || msgType == 2)
+            else if (msgType == 0 || msgType == 1 || msgType == 2)
             {
-                return ParseLLMessage(msg, msgType);
+                logMessages.Add(ParseLLMessage(msg, msgType));
             }
             else if (msgType == 3)
             {
-                return ParseCRMMessage(msg, true);
+                logMessages.Add(ParseCRMMessage(msg, true));
             }
             else if (msgType == 4)
             {
-                return ParseCRMMessage(msg, false);
+                logMessages.Add(ParseCRMMessage(msg, false));
+            }
+
+            if  (logMessages.Count > 0 && logMessages[0] != null)
+            {
+                return logMessages;
             }
             else
             {

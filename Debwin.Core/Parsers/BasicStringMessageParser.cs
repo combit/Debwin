@@ -7,9 +7,9 @@ namespace Debwin.Core.Parsers
 {
     public class BasicStringMessageParser : IMessageParser
     {
-        public LogMessage CreateMessageFrom(object rawMessage)
+        public IList<LogMessage> CreateMessageFrom(object rawMessage)
         {
-            return new LogMessage(rawMessage as string);
+            return new List<LogMessage>() { new LogMessage(rawMessage as string) };
         }
 
         IEnumerable<int> IMessageParser.GetSupportedMessageTypeCodes()

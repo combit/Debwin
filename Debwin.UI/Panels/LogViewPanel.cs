@@ -439,7 +439,7 @@ namespace Debwin.UI.Panels
             SetTimeDifferenceFilter(e.FilterDefinition);
 
             // Only for small logs we should allow the automatically triggered filters that are created while typing in the filter panel ("instant search")
-            if (e.IsAutoTriggeredFilter && _logViewStack[0].MessageCount > 100000)
+            if (e.IsAutoTriggeredFilter && _logViewStack[0].MessageCount > 1000000)
                 return;
 
             bool setFocusToListView = !e.IsAutoTriggeredFilter;   // don't steal focus while user is typing in the filter panel
@@ -1309,7 +1309,7 @@ namespace Debwin.UI.Panels
                 }
                 else
                 {
-                    SaveFileDialog fileDialog = new SaveFileDialog() { Filter = "Debwin4 Log File (.log4)|*.log4" };
+                    SaveFileDialog fileDialog = new SaveFileDialog() { Filter = "Debwin4 Log|*.log4", FileName = "Debwin4", Title = "Save Log" };
                     if (fileDialog.ShowDialog(this) == DialogResult.OK)
                     {
                         outputFilePath = fileDialog.FileName;
