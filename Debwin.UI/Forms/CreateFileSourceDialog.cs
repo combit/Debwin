@@ -169,7 +169,7 @@ namespace Debwin.UI.Forms
                 }
 
                 // cRM or has the CXUT22 / CMLL31 / ... format?
-                if (log.StartsWith("cRM:") || Regex.IsMatch(log, @"^C[MX][A-Z]{2}\d{2}.{2}:.*", RegexOptions.Singleline))
+                if (Regex.IsMatch(log, @"^cRM.+:", RegexOptions.Singleline) || Regex.IsMatch(log, @"^C[MX][A-Z]{2}\d{2}.{2}:.*", RegexOptions.Singleline))
                 {
                     lstLogType.SelectedIndex = 3;
                     return true;

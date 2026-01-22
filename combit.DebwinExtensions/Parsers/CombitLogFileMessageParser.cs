@@ -3,6 +3,7 @@ using Debwin.Core;
 using Debwin.Core.Parsers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 
 namespace combit.DebwinExtensions.Parsers
@@ -40,6 +41,12 @@ namespace combit.DebwinExtensions.Parsers
                 _isFirstMessage = false;
             }
 
+            // Ignore newlines (e. g. from stacktraces)
+            if (String.IsNullOrEmpty(msg))
+            {
+                return null;
+            }
+
             // Formats to expect:
 
             // (0) Log message with category and level (LL22 log written by LL)
@@ -57,14 +64,19 @@ namespace combit.DebwinExtensions.Parsers
             // (4) cRM Format (alternative, from cRMDebug.exe)
             // 14:57:27.517 00000B3C      >CDAFwCmnd::ExecuteSQLCmndParam(..., 0)
 
+            // (5) New Util-format
+            // CMLL31  : 2025-10-27 11:20:37.150 000{chk}thread 'CMLL31::LLXLoadProxy' was alive for 61 ms (UserMode: 0 ms, KernelMode: 0 ms)
+
             // (-1) Invalid Format / Wrapped lines of earlier messages:
             // /CMBTLE                 :          0, 8,
 
 
             // Detect format
-            if (msg.Length > "CMLL22  : 09:15:34.222 00001bbc/00 6 [???]".Length && msg[8] == ':')   // cases (0), (1) or (2)
+            if (msg.Length > "CMLL22  : 09:15:34.222 00001bbc/00 6 [???]".Length && msg[8] == ':')   // cases (0), (1), (2) or (5)
             {
-                if (msg.Length > "CMLL22  : 11:20:31.117 0000101c/00 2 [L02 API]".Length && msg[37] == '[' && msg[38] == 'L' && msg[45] == ']')  // has [L02 C01] block?  (level 2, category 1)
+                if (msg.Length > "CMLL22  : 2025-10-27 09:15:34.222 000".Length && msg[14] == '-' && msg[17] == '-') // case (5)
+                    msgType = 5;
+                else if (msg.Length > "CMLL22  : 11:20:31.117 0000101c/00 2 [L02 API]".Length && msg[37] == '[' && msg[38] == 'L' && msg[45] == ']')  // has [L02 C01] block?  (level 2, category 1)
                     msgType = 0;
                 else if (msg[37] == '[' && msg[41] == ']')  // has text category? E.g. "[EXP]"
                     msgType = 1;
@@ -91,7 +103,7 @@ namespace combit.DebwinExtensions.Parsers
                 logMessages.Add(HandleNonStandardMessage(msg));
             }
             // Handle (1) and (2):
-            else if (msgType == 0 || msgType == 1 || msgType == 2)
+            else if (msgType == 0 || msgType == 1 || msgType == 2 || msgType == 5)
             {
                 logMessages.Add(ParseLLMessage(msg, msgType));
             }
@@ -104,8 +116,9 @@ namespace combit.DebwinExtensions.Parsers
                 logMessages.Add(ParseCRMMessage(msg, false));
             }
 
-            if  (logMessages.Count > 0 && logMessages[0] != null)
+            if (logMessages.Count > 0 && logMessages[0] != null)
             {
+                _lastCreatedMessage = logMessages[0];
                 return logMessages;
             }
             else
@@ -120,13 +133,13 @@ namespace combit.DebwinExtensions.Parsers
             string module = "cRM";
 
             DateTime? timestamp = null;
-            if (!ParseTimestamp(msg, hasCrmPrefix ? "cRM:".Length : 0, out timestamp))
+            if (!ParseTimestamp(msg, hasCrmPrefix ? "cRM:".Length : 0, false, out timestamp))
                 return HandleNonStandardMessage(msg);
 
             string thread = msg.Substring(hasCrmPrefix ? 17 : 13, 8);
             string text = text = msg.Substring(hasCrmPrefix ? 26 : 22);
 
-            return new ListLabelLogMessage()
+            var result = new ListLabelLogMessage()
             {
                 Message = text,
                 ModuleName = module,
@@ -135,18 +148,26 @@ namespace combit.DebwinExtensions.Parsers
                 Timestamp = timestamp.Value,
                 Level = LogLevel.Debug
             };
+
+            if (result.Message.StartsWith("WRN:"))
+                result.Level = LogLevel.Warning;
+            else if (result.Message.StartsWith("ERR:"))
+                result.Level = LogLevel.Error;
+
+            return result;
         }
 
         private LogMessage ParseLLMessage(string msg, int msgType)
         {
             string module = msg.Substring(0, 8).TrimEnd(' ');
+            bool hasDate = (msgType == 5);
 
             DateTime? timestamp = null;
-            if (!ParseTimestamp(msg, "CMLL22  : ".Length, out timestamp))
+            if (!ParseTimestamp(msg, "CMLL22  : ".Length, hasDate, out timestamp))
                 return HandleNonStandardMessage(msg);
 
-            string thread = msg.Substring(23, 8);
-            string cpu = msg.Substring(32, 2);
+            string thread = msg.Substring(hasDate ? 23+11 : 23, 8);
+            string cpu = msg.Substring(hasDate ? 32+11 : 32, 2);
 
             string category;
             string text;
@@ -167,6 +188,11 @@ namespace combit.DebwinExtensions.Parsers
             {
                 category = "-";
                 text = msg.Substring(37);   // starts at 38 in LL21, and 37 in LL22+
+            }
+            else if (msgType == 5) // CMLL31  : 2025-10-27 11:20:37.150 000{chk}thread 'CMLL31::LLXLoadProxy' was alive for 61 ms (UserMode: 0 ms, KernelMode: 0 ms)
+            {
+                category = "-";
+                text = msg.Substring(48);
             }
             else
             {
@@ -189,7 +215,7 @@ namespace combit.DebwinExtensions.Parsers
                 LoggerName = category,
                 ModuleName = module,
                 Thread = thread,
-                ProcessorNr = int.Parse(cpu, NumberStyles.None),
+                ProcessorNr = int.Parse(cpu, NumberStyles.HexNumber),
                 Timestamp = timestamp.Value
             };
         }
@@ -199,39 +225,77 @@ namespace combit.DebwinExtensions.Parsers
         {
             if (_lastCreatedMessage != null)
             {
-                _lastCreatedMessage.Message += msg;
+                return new LogMessage(_lastCreatedMessage)
+                {
+                    Message = msg,
+                };
             }
 
             return null;
         }
 
-        private bool ParseTimestamp(string msg, int offset, out DateTime? timestamp)
+        private bool ParseTimestamp(string msg, int offset, bool withDate, out DateTime? timestamp)
         {
-            int hour = 0;
-            int min = 0;
-            int sec = 0;
-            int msec = 0;
             timestamp = null;
+            int hour = 0, min = 0, sec = 0, msec = 0;
+            int year = 1, month = 1, day = 1; // defaults if date not given
 
-            if (msg.Length < offset + 9 + 3)
+            if (withDate)
+            {
+                // Expected format: yyyy-MM-dd HH:mm:ss.fff
+                if (msg.Length < offset + 23)
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset, 4), NumberStyles.None, CultureInfo.InvariantCulture, out year))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 5, 2), NumberStyles.None, CultureInfo.InvariantCulture, out month))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 8, 2), NumberStyles.None, CultureInfo.InvariantCulture, out day))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 11, 2), NumberStyles.None, CultureInfo.InvariantCulture, out hour))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 14, 2), NumberStyles.None, CultureInfo.InvariantCulture, out min))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 17, 2), NumberStyles.None, CultureInfo.InvariantCulture, out sec))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 20, 3), NumberStyles.None, CultureInfo.InvariantCulture, out msec))
+                    return false;
+            }
+            else
+            {
+                // Expected format: HH:mm:ss.fff
+                if (msg.Length < offset + 12)
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset, 2), NumberStyles.None, CultureInfo.InvariantCulture, out hour))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 3, 2), NumberStyles.None, CultureInfo.InvariantCulture, out min))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 6, 2), NumberStyles.None, CultureInfo.InvariantCulture, out sec))
+                    return false;
+
+                if (!int.TryParse(msg.Substring(offset + 9, 3), NumberStyles.None, CultureInfo.InvariantCulture, out msec))
+                    return false;
+            }
+
+            try
+            {
+                timestamp = new DateTime(year, month, day, hour, min, sec, msec, DateTimeKind.Local);
+                return true;
+            }
+            catch
+            {
                 return false;
-
-            if (!int.TryParse(msg.Substring(offset, 2), NumberStyles.None, CultureInfo.InvariantCulture, out hour))
-                return false;
-
-            if (!int.TryParse(msg.Substring(offset + 3, 2), NumberStyles.None, CultureInfo.InvariantCulture, out min))
-                return false;
-
-            if (!int.TryParse(msg.Substring(offset + 6, 2), NumberStyles.None, CultureInfo.InvariantCulture, out sec))
-                return false;
-
-            if (!int.TryParse(msg.Substring(offset + 9, 3), NumberStyles.None, CultureInfo.InvariantCulture, out msec))
-                return false;
-
-            timestamp = new DateTime(1, 1, 1, hour, min, sec, msec, DateTimeKind.Local);
-            return true;
+            }
         }
-
     }
 
     public class ListLabelLogHelper
